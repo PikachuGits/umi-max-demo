@@ -11,3 +11,12 @@
 /dist
 /.mfsu
 .swc
+/.idea/.gitignore
+/.idea/bgpt-1.0.0.iml
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/pnpm-lock.yaml
+/.idea/codeStyles/Project.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
