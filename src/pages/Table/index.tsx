@@ -3,6 +3,7 @@ import {
   ActionType,
   FooterToolbar,
   PageContainer,
+  ProColumns,
   ProDescriptions,
   ProDescriptionsItemProps,
   ProTable,
@@ -28,6 +29,7 @@ const handleAdd = async (fields: API.UserInfo) => {
     return true;
   } catch (error) {
     hide();
+    console.log();
     message.error('添加失败请重试！');
     return false;
   }
@@ -90,11 +92,59 @@ const TableList: React.FC<unknown> = () => {
   const actionRef = useRef<ActionType>();
   const [row, setRow] = useState<API.UserInfo>();
   const [selectedRowsState, setSelectedRows] = useState<API.UserInfo[]>([]);
-  const columns: ProDescriptionsItemProps<API.UserInfo>[] = [
+  const columns: ProColumns<API.UserInfo>[] = [
     {
       title: '名称',
       dataIndex: 'name',
-      tip: '名称是唯一的 key',
+      // tip: '名称是唯一的 key',
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: '名称为必填项',
+          },
+        ],
+      },
+    },
+    {
+      title: '昵称',
+      dataIndex: 'nickName',
+      valueType: 'text',
+    },
+    {
+      title: '性别',
+      dataIndex: 'gender',
+      hideInForm: true,
+      valueEnum: {
+        0: { text: '男', status: 'MALE' },
+        1: { text: '女', status: 'FEMALE' },
+      },
+    },
+    {
+      title: '操作',
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => (
+        <>
+          <a
+            onClick={() => {
+              handleUpdateModalVisible(true);
+              setStepFormValues(record);
+            }}
+          >
+            配置
+          </a>
+          <Divider type="vertical" />
+          <a href="">订阅警报</a>
+        </>
+      ),
+    },
+  ];
+
+  const descriptionColumns: ProDescriptionsItemProps<API.UserInfo>[] = [
+    {
+      title: '名称',
+      dataIndex: 'name',
       formItemProps: {
         rules: [
           {
@@ -211,7 +261,7 @@ const TableList: React.FC<unknown> = () => {
             if (success) {
               handleModalVisible(false);
               if (actionRef.current) {
-                actionRef.current.reload();
+                await actionRef.current.reload();
               }
             }
           }}
@@ -228,7 +278,7 @@ const TableList: React.FC<unknown> = () => {
               handleUpdateModalVisible(false);
               setStepFormValues({});
               if (actionRef.current) {
-                actionRef.current.reload();
+                await actionRef.current.reload();
               }
             }
           }}
@@ -259,7 +309,7 @@ const TableList: React.FC<unknown> = () => {
             params={{
               id: row?.name,
             }}
-            columns={columns}
+            columns={descriptionColumns}
           />
         )}
       </Drawer>
