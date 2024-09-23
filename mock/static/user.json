@@ -1,0 +1,17 @@
+{
+  "code": 10000,
+  "message": "操作成功",
+  "data": {
+    "token": "ZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKSVV6STFOaUlzSW1wMGFTSTZJaklpZlEuZXlKcGMzTWlPaUpvZEhSd09sd3ZYQzh4TURFdU1qQXhMak0xTGpZNElpd2lhblJwSWpvaU1pSXNJbWxoZENJNk1UY3lOVGt5TkRJeE1Td2libUptSWpveE56STFPVEkwTWpFeExDSmxlSEFpT2pFM01qWXdNVEEyTVRFc0ltUmhkR0VpT2lKN1hDSmhaRzFwYmw5cFpGd2lPaklzWENKcGMxOWhaRzFwYmx3aU9qRXNYQ0pwYzE5emRYQmxjbDloWkcxcGJsd2lPakVzWENKcGMxOXFiMmx1WDJOcGNtTnNaVndpT2pBc1hDSjFjMlZ5Ym1GdFpWd2lPbHdpWVdSdGFXNWNJaXhjSW5KbFlXeHVZVzFsWENJNlhDSmNkVGRpWVRGY2RUYzBNRFpjZFRVME5UaGhaRzFwYmpZMk5sd2lMRndpYzNSdmNtVmZhV1JjSWpvd0xGd2liRzluYVc1ZmRHbHRaVndpT2x3aU1qQXlOQzB3T1MweE1DQXdOem95TXpvek1Wd2lMRndpYkc5bmFXNWZhWEJjSWpwY0lqRXdNUzR5TURFdU16VXVOamhjSWl4Y0ltRndjR3hwWTJGMGFXOXVYMmxrWENJNk1IMGlmUS4wWldkSmxqb0ZHYnJHemQyV3lIcENEVGxLa01mZzBzTFQ0MTVMcHY4bHE4",
+    "username": "admin",
+    "realname": "管理员admin666",
+    "is_super_admin": 1,
+    "is_join_circle": 0,
+    "login_time": "2024-09-10 07:23:31",
+    "login_ip": "101.201.35.68",
+    "application_id": 0,
+    "store_id": 0
+  },
+  "url": "",
+  "operate": "admin/Admin/login"
+}

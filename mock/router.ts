@@ -1,12 +1,24 @@
 import routes from './static/routes.json';
 const router: object[] = routes;
+
+const routes_2 = [
+  {
+    name: ' CRUD 示例',
+    path: '/table',
+    component: 'pages/Table',
+  },
+];
 export default {
   //
   'GET /mock/router/getRoutesList': (reg: any, res: any) => {
+    console.log('getRoutesList', reg.query.id);
+    const data = reg.query.id == 2 ? routes_2 : router;
     res.json({
-      success: true,
-      data: router,
-      errorCode: 0,
+      code: 10000,
+      message: '操作成功',
+      data,
+      url: '',
+      operate: 'admin/Admin/login',
     });
   },
 };

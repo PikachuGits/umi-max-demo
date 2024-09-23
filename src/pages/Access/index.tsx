@@ -1,11 +1,17 @@
-import { Access } from '@@/exports';
+import { Access, useModel } from '@@/exports';
 import { PageContainer } from '@ant-design/pro-components';
 import { useAccess } from '@umijs/max';
 import { Button } from 'antd';
 
 const AccessPage: React.FC = () => {
   const access = useAccess();
-  console.log('00000');
+  const { initialState, setInitialState } = useModel('@@initialState');
+
+  function coll() {
+    // store.dispatch({ type: 'setting/onCollapsed' });
+    // const collapsed = store.getState().setting.collapsed;
+    // setInitialState({ ...initialState, collapsed });
+  }
   return (
     <PageContainer
       ghost
@@ -17,6 +23,7 @@ const AccessPage: React.FC = () => {
       <Access accessible={access.canSeeAdmin}>
         <Button>只有 Admin 可以看到这个按钮</Button>
       </Access>
+      <Button onClick={coll}> 收起菜单 </Button>
     </PageContainer>
   );
 };

@@ -1,18 +1,68 @@
 [
   {
-    "name": "测试首页",
-    "path": "/index/page",
-    "component": "pages/Home"
+    "id": "1",
+    "path": "/main/company",
+    "name": "公司管理",
+    "icon": "FastForwardOutlined",
+    "children": [
+      {
+        "id": "2",
+        "name": "公司列表",
+        "icon": "smile",
+        "path": "/main/company/list",
+        "component": "pages/MainPlatform/Company/List"
+      }
+    ]
   },
   {
-    "name": "测试demo",
-    "path": "/index/access",
-    "component": "pages/Demo",
-    "layout": false,
-    "headerRender": false,
-    "footerRender": false,
-    "menuRender": false,
-    "menuHeaderRender": false,
-    "hideInMenu": true
+    "id": "3",
+    "path": "/main/user",
+    "name": "用户管理",
+    "icon": "FastForwardOutlined",
+    "children": [
+      {
+        "id": "4",
+        "name": "用户组列表",
+        "icon": "FastForwardOutlined",
+        "path": "/main/user/group",
+        "component": "pages/MainPlatform/User/Group"
+      },
+      {
+        "id": "5",
+        "name": "用户列表",
+        "icon": "FastForwardOutlined",
+        "path": "/main/user/list",
+        "component": "pages/MainPlatform/User/List"
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "path": "/main/system",
+    "name": "系统管理",
+    "icon": "FastForwardOutlined",
+    "children": [
+      {
+        "id": "7",
+        "name": "系统配置",
+        "icon": "smile",
+        "path": "/main/system/configuration",
+        "component": "pages/MainPlatform/System/Configuration"
+      },
+      {
+        "id": "8",
+        "name": "字典配置",
+        "icon": "smile",
+        "path": "/main/system/dictionary",
+        "component": "pages/MainPlatform/System/Dictionary"
+      },
+      {
+        "id": "9",
+        "name": "菜单管理",
+        "icon": "smile",
+        "path": "/main/system/menu",
+        "component": "pages/MainPlatform/System/Menu"
+      }
+    ]
   }
 ]

@@ -8,8 +8,6 @@ declare namespace Routes {
     hideInMenu?: boolean;
     /** @name 在面包屑中隐藏 */
     hideInBreadcrumb?: boolean;
-    /** @name 菜单的icon */
-    icon?: React.ReactNode;
     /** @name 自定义菜单的国际化 key */
     locale?: string | false;
     /** @name 菜单的名字 */
@@ -30,7 +28,6 @@ declare namespace Routes {
     /** @name 指定外链打开形式，同a标签 */
     target?: string;
 
-    [key: string]: any;
     [key: string]: any;
   }
 }
