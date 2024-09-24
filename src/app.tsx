@@ -48,28 +48,33 @@ export async function getInitialState(): Promise<InitialStateType> {
 }
 
 export const layout = ({ initialState, setInitialState }: any) => {
+  const contentDeviationX =
+    document.documentElement.offsetWidth > 767 ? (initialState?.collapsed ? '65px' : '256px') : '0px';
+
   return {
     ...initialState,
-    // 去掉系统自带
-    // collapsedButtonRender: false,
     collapsed: initialState?.collapsed,
     onCollapse: (collapsed: boolean) => {
       setInitialState({ ...initialState, collapsed });
     },
+    contentStyle: {
+      width: `calc(100vw - ${contentDeviationX})`,
+      height: 'calc(100vh - 56px)',
+    },
     // headerContentRender: () => <ProBreadcrumb />,
     breadcrumbRender: (routers = []) => {
-      console.log(routers);
       return [...routers];
     },
-    menu: {
-      // maskClosable: true,
-      loading: false,
-      locale: false,
-      request: async (params: object, defaultMenuData: object[]) => {
-        console.log('params', params, defaultMenuData);
-        return defaultMenuData;
-      },
-    },
+    // menu: {
+    //   // maskClosable: true,
+    //   loading: false,
+    //   locale: false,
+    //   request: async (params: object, defaultMenuData: object[]) => {
+    //     // console.log('params', params, defaultMenuData);
+    //     return defaultMenuData;
+    //   },
+    // },
+    menu: false,
     // menuRender: () => {},
   };
 };

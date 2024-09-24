@@ -20,7 +20,7 @@ export function encodeWebPassword(password: string) {
  * 判断 undefined 和 null 判断空字符串 判断空数组 判断空对象
  * @param value 为空返回true 不为空返回false
  */
-export function isEmpty(value: string | object | undefined | object[] | null): boolean {
+export function isEmpty(value: string | object | undefined | object[] | null): value is undefined | null | '' {
   return (
     value === undefined ||
     value === null ||

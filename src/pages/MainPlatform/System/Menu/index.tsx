@@ -1,96 +1,71 @@
-import { EllipsisOutlined } from '@ant-design/icons';
+import { MenuForm, MenuHeader, MenuTree } from '@/pages/MainPlatform/System/Menu/component';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Button, Dropdown } from 'antd';
+import { useEffect, useState } from 'react';
+import { data } from './data';
+export default () => {
+  const Header = () => {
+    return <div>菜单栏测试头部信息</div>;
+  };
 
-export default () => (
-  <div
-    style={{
-      background: '#F5F7FA',
-    }}
-  >
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
+  /**
+   * true 显示 全部收起, 执行的也是全部收起操作
+   * false 显示 全部展开, 执行的也是全部展开操作
+   */
+  const [isExpandedAll, setIsExpandedAll] = useState(false); // 追踪是否全部展开
+
+  const getAllKeys = (data: any[]): string[] => {
+    return data.reduce((keys: string[], item) => {
+      keys.push(item.id); // 使用 `id` 作为 key
+      if (item.children) {
+        keys.push(...getAllKeys(item.children)); // 使用扩展运算符代替 concat
+      }
+      return keys;
+    }, []);
+  };
+
+  // 每次 `expandedKeys` 变化时检查是否已经全部展开
+  useEffect(() => {
+    const allKeys = getAllKeys(data);
+    setIsExpandedAll(expandedKeys.length === allKeys.length);
+  }, [expandedKeys, data]);
+
+  //
+  function onExpandedAll() {
+    if (!isExpandedAll) {
+      const allKeys = getAllKeys(data);
+      setExpandedKeys(allKeys);
+    } else {
+      setExpandedKeys([]);
+    }
+    setIsExpandedAll(!isExpandedAll); // 切换展开/收起状态
+  }
+
+  return (
     <PageContainer
+      breadcrumbRender={false}
+      title={false}
+      style={{ background: 'transparent' }}
       header={{
-        title: '页面标题',
-        ghost: true,
-        breadcrumb: {
-          items: [
-            {
-              path: '',
-              title: '一级页面',
-            },
-            {
-              path: '',
-              title: '二级页面',
-            },
-            {
-              path: '',
-              title: '当前页面',
-            },
-          ],
-        },
-        extra: [
-          <Button key="1">次要按钮</Button>,
-          <Button key="2">次要按钮</Button>,
-          <Button key="3" type="primary">
-            主要按钮
-          </Button>,
-          <Dropdown
-            key="dropdown"
-            trigger={['click']}
-            menu={{
-              items: [
-                {
-                  label: '下拉菜单',
-                  key: '1',
-                },
-                {
-                  label: '下拉菜单2',
-                  key: '2',
-                },
-                {
-                  label: '下拉菜单3',
-                  key: '3',
-                },
-              ],
-            }}
-          >
-            <Button key="4" style={{ padding: '0 8px' }}>
-              <EllipsisOutlined />
-            </Button>
-          </Dropdown>,
-        ],
+        children: <Header />,
       }}
-      tabBarExtraContent="测试tabBarExtraContent"
-      tabList={[
-        {
-          tab: '基本信息',
-          key: 'base',
-          closable: false,
-        },
-        {
-          tab: '详细信息',
-          key: 'info',
-        },
-      ]}
-      tabProps={{
-        type: 'editable-card',
-        hideAdd: true,
-        onEdit: (e, action) => console.log(e, action),
-      }}
-      footer={[
-        <Button key="3">重置</Button>,
-        <Button key="2" type="primary">
-          提交
-        </Button>,
-      ]}
     >
-      <ProCard direction="column" ghost gutter={[0, 16]}>
-        <ProCard style={{ height: 200 }} />
-        <ProCard gutter={16} ghost style={{ height: 200 }}>
-          <ProCard colSpan={16} />
-          <ProCard colSpan={8} />
+      <ProCard gutter={{ xs: 8, sm: 16, md: 24 }} ghost style={{ paddingTop: '10px' }}>
+        <ProCard
+          colSpan={'420px'}
+          style={{ height: '100%' }}
+          headerBordered
+          title={
+            <MenuHeader onExpandedAll={() => onExpandedAll} isExpandedAll={isExpandedAll} onExpand={setExpandedKeys} />
+          }
+        >
+          {/* 树形插件,展示菜单栏列表 */}
+          <MenuTree treeData={data} expandedKeys={expandedKeys} onExpand={setExpandedKeys} />
+        </ProCard>
+        <ProCard colSpan={'auto'} style={{ minWidth: '800px', height: '100%' }}>
+          <MenuForm />
         </ProCard>
       </ProCard>
     </PageContainer>
-  </div>
-);
+  );
+};

@@ -10,6 +10,7 @@ export default defineConfig({
     // 解决首次加载时白屏的问题
     { src: '/scripts/loading.js', async: true },
   ],
+
   favicons: ['/favicon.ico'],
   plugins: [`${__dirname}/../src/plugins/umi-plugin-loading`],
   customLoading: '@/components/Loading/loading',

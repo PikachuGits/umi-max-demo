@@ -1,24 +1,18 @@
 import logo from '@/assets/images/logo.png';
 import { ActionsRender, AvatarDropdown, HeaderRender, MenuHeaderRender } from '@/settings/components';
-interface AppListType {
-  icon: string;
-  title: string;
-  desc: string;
-  url: string;
-}
 
 export const initialStateDefault = {
   title: '建业管理平台',
   logo: logo,
   layout: 'mix',
-  fixSiderbar: true,
   loading: false,
-  onTopMixMenuHeaderClick: () => {
-    console.log('onTopMixMenuHeaderClick');
+  token: {
+    sider: {
+      colorMenuBackground: '#FFF',
+    },
   },
-  onMenuHeaderClick: () => {
-    console.log('onMenuHeaderClick');
-  },
+
+  contentWidth: 'Fluid',
   // menu头部dom
   menuHeaderRender: MenuHeaderRender,
   // 右侧图标列表( 不包含头像 )
@@ -32,6 +26,5 @@ export const initialStateDefault = {
     },
   },
   headerRender: HeaderRender,
-
   // splitMenus: true, //
 };
