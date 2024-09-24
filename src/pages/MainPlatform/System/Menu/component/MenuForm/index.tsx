@@ -6,7 +6,7 @@ import Icons, * as AntdIcons from '@ant-design/icons';
 import { ProForm, ProFormGroup, ProFormInstance, ProFormRadio, ProFormText } from '@ant-design/pro-components';
 import { useSetState } from 'ahooks';
 import { message } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { Suspense, useRef, useState } from 'react';
 import styles from '../../styles/component/menu-form.less';
 import IconSelect from '../IconSelect';
 const waitTime = (time: number = 100) => {
@@ -17,13 +17,10 @@ const waitTime = (time: number = 100) => {
   });
 };
 
-const allAntdIcons: {
-  [key: string]: any;
-} = AntdIcons;
-
 export default () => {
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const [initialValues, setInitialValues] = useSetState({
+  // , setInitialValues
+  const [initialValues] = useSetState({
     node_type: 1,
     name: '杰作',
     icon: '',
@@ -64,98 +61,100 @@ export default () => {
   );
 
   return (
-    <ProForm<{
-      name: string;
-      company?: string;
-      useMode?: string;
-    }>
-      formRef={formRef}
-      labelCol={{ span: 6 }}
-      labelAlign="right"
-      layout={'horizontal'}
-      initialValues={initialValues}
-      grid={true}
-      onFinish={async (values) => {
-        await waitTime(2000);
-        console.log(values);
-        message.success('提交成功');
-      }}
-    >
-      <ProFormGroup>
-        <ProFormRadio.Group
-          name="node_type"
-          label="节点类型"
-          radioType="button"
-          colProps={{ span: 12 }}
-          options={[
-            {
-              label: '菜单',
-              value: 1,
-            },
-            {
-              label: '按钮',
-              value: 2,
-            },
-          ]}
-        />
-        <ProFormRadio.Group
-          name="node_type"
-          label="归属平台"
-          radioType="button"
-          colProps={{ span: 12 }}
-          options={[
-            {
-              label: '系统平台',
-              value: 1,
-            },
-            {
-              label: '公司',
-              value: 2,
-            },
-            {
-              label: '项目',
-              value: 3,
-            },
-          ]}
-        />
-      </ProFormGroup>
-      <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="上级菜单" placeholder="请输入名称" />
-      <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="权限标识" placeholder="请输入名称" />
-      <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="菜单名称" placeholder="请输入名称" />
-      <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="排序" placeholder="请输入名称" />
-      <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="路由地址" placeholder="请输入名称" />
-      <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="组件路径" placeholder="请输入名称" />
-      <ProFormText
-        width="md"
-        colProps={{ span: 12 }}
-        name="icon"
-        label="图标"
-        placeholder="请输入名称"
-        fieldProps={{
-          // className: classes_module(styles, 'antd-icon-input'),
-          disabled: true,
-          addonBefore: <IconBeforeNode />,
-          addonAfter: <IconAfterNode />,
-          onFocus: () => setPopoverOpen(true),
+    <Suspense>
+      <ProForm<{
+        name: string;
+        company?: string;
+        useMode?: string;
+      }>
+        formRef={formRef}
+        labelCol={{ span: 6 }}
+        labelAlign="right"
+        layout={'horizontal'}
+        initialValues={initialValues}
+        grid={true}
+        onFinish={async (values) => {
+          await waitTime(2000);
+          console.log(values);
+          message.success('提交成功');
         }}
-      />
+      >
+        <ProFormGroup>
+          <ProFormRadio.Group
+            name="node_type"
+            label="节点类型"
+            radioType="button"
+            colProps={{ span: 12 }}
+            options={[
+              {
+                label: '菜单',
+                value: 1,
+              },
+              {
+                label: '按钮',
+                value: 2,
+              },
+            ]}
+          />
+          <ProFormRadio.Group
+            name="node_type"
+            label="归属平台"
+            radioType="button"
+            colProps={{ span: 12 }}
+            options={[
+              {
+                label: '系统平台',
+                value: 1,
+              },
+              {
+                label: '公司',
+                value: 2,
+              },
+              {
+                label: '项目',
+                value: 3,
+              },
+            ]}
+          />
+        </ProFormGroup>
+        <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="上级菜单" placeholder="请输入名称" />
+        <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="权限标识" placeholder="请输入名称" />
+        <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="菜单名称" placeholder="请输入名称" />
+        <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="排序" placeholder="请输入名称" />
+        <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="路由地址" placeholder="请输入名称" />
+        <ProFormText width="md" colProps={{ span: 12 }} name="parent_id" label="组件路径" placeholder="请输入名称" />
+        <ProFormText
+          width="md"
+          colProps={{ span: 12 }}
+          name="icon"
+          label="图标"
+          placeholder="请输入名称"
+          fieldProps={{
+            // className: classes_module(styles, 'antd-icon-input'),
+            disabled: true,
+            addonBefore: <IconBeforeNode />,
+            addonAfter: <IconAfterNode />,
+            onFocus: () => setPopoverOpen(true),
+          }}
+        />
 
-      <ProFormRadio.Group
-        name="node_type"
-        label="节点状态"
-        radioType="button"
-        colProps={{ span: 12 }}
-        options={[
-          {
-            label: '启用',
-            value: 1,
-          },
-          {
-            label: '禁用',
-            value: 2,
-          },
-        ]}
-      />
-    </ProForm>
+        <ProFormRadio.Group
+          name="node_type"
+          label="节点状态"
+          radioType="button"
+          colProps={{ span: 12 }}
+          options={[
+            {
+              label: '启用',
+              value: 1,
+            },
+            {
+              label: '禁用',
+              value: 2,
+            },
+          ]}
+        />
+      </ProForm>
+    </Suspense>
   );
 };

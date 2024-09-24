@@ -30,7 +30,7 @@ export default () => {
     setIsExpandedAll(expandedKeys.length === allKeys.length);
   }, [expandedKeys, data]);
 
-  //
+  // 展开全部/收起全部
   function onExpandedAll() {
     if (!isExpandedAll) {
       const allKeys = getAllKeys(data);
