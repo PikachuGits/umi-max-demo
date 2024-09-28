@@ -64,5 +64,19 @@
         "component": "pages/MainPlatform/System/Menu"
       }
     ]
+  },
+  {
+    "id": "10",
+    "path": "/main/permission",
+    "name": "权限管理",
+    "icon": "FastForwardOutlined",
+    "children": [
+      {
+        "name": "授权管理",
+        "icon": "FastForwardOutlined",
+        "path": "/main/permission/auth",
+        "component": "pages/MainPlatform/Permission/Authorize"
+      }
+    ]
   }
 ]

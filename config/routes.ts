@@ -64,6 +64,23 @@ export const routes = [
     ],
   },
   // {
+  //   path: '/dashboard',
+  //   name: '授权管理',
+  //   icon: 'dashboard',
+  //   routes: [
+  //     {
+  //       path: '/dashboard',
+  //       redirect: '/dashboard/workplace',
+  //     },
+  //     {
+  //       name: '授权管理',
+  //       icon: 'smile',
+  //       path: '/dashboard/workplace',
+  //       component: '@/pages/Dashboard/Workplace',
+  //     },
+  //   ],
+  // },
+  // {
   //   path: '/main/company',
   //   name: '公司管理',
   //   icon: 'dashboard',

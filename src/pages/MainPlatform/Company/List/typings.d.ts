@@ -15,6 +15,7 @@ type GithubIssueItem = {
   created_at: string;
   updated_at: string;
   closed_at?: string;
+  [key: string]: any;
 };
 
 type FuncColumnsProps = {
