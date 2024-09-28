@@ -1,10 +1,12 @@
 import { ActionsRender, AvatarDropdown } from '@/settings/components';
+import { CompanyListDrawer } from '@/settings/components/HeaderRender/component';
 import styles from '@/settings/styles/settings/header-render.less';
 import { classes_module } from '@/utils/class-module';
 import { AlignLeftOutlined, ProductOutlined } from '@ant-design/icons';
 import { ProBreadcrumb } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import { Avatar, Tooltip } from 'antd';
+import { useState } from 'react';
 
 /**
  * Header 导航
@@ -13,6 +15,7 @@ import { Avatar, Tooltip } from 'antd';
 export default (props: any) => {
   const { title, logo, avatarProps } = props;
   const { initialState, setInitialState } = useModel('@@initialState');
+  const [open, setOpen] = useState(false);
 
   //  切换菜单抽屉打开/关闭
   function onCollapse() {
@@ -32,7 +35,10 @@ export default (props: any) => {
           />
           <Tooltip title="切换公司">
             {/* 公司菜单 */}
-            <ProductOutlined className={classes_module(styles, 'headerRender-container-icon')} />
+            <ProductOutlined
+              className={classes_module(styles, 'headerRender-container-icon')}
+              onClick={() => setOpen(true)}
+            />
           </Tooltip>
         </div>
         {/* logo + 标题 */}
@@ -58,6 +64,7 @@ export default (props: any) => {
           </div>
         </AvatarDropdown>
       </div>
+      <CompanyListDrawer open={open} setOpen={setOpen} />
     </div>
   );
 };

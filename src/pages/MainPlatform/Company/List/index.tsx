@@ -1,9 +1,8 @@
 import { CustomPageContainer, ProEditable } from '@/components';
+import { CompanyFormDrawer } from '@/pages/MainPlatform/Company/List/component';
 import { defaultColumns } from '@/pages/MainPlatform/Company/List/config/table-columns';
 import { editCompanyInfo, getCompanyListToTable } from '@/services/company/CompanyController';
-import { PlusOutlined } from '@ant-design/icons';
 import { ActionType } from '@ant-design/pro-components';
-import { Button } from 'antd';
 import { useRef } from 'react';
 
 export default () => {
@@ -50,18 +49,7 @@ export default () => {
           pageSize: 10,
           // onChange: (page) => console.log('page', page),
         }}
-        additionalButtons={[
-          <Button
-            key="button"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              // actionRef.current?.reload();
-            }}
-            type="primary"
-          >
-            创建公司
-          </Button>,
-        ]}
+        additionalButtons={[<CompanyFormDrawer />]}
       />
     </CustomPageContainer>
   );
