@@ -58,4 +58,7 @@ store.subscribe(() => {
   });
 });
 
+// 从 store 中推断 dispatch 类型
+export type AppDispatch = typeof store.dispatch;
+
 export default store;

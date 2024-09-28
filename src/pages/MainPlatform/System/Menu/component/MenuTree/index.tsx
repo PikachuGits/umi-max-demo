@@ -1,80 +1,80 @@
 import TitleNode from '@/pages/MainPlatform/System/Menu/component/MenuTree/TitleNode';
-import { Flex, Input, Tree, TreeDataNode, TreeProps } from 'antd';
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
-
-const getParentKey = (key: React.Key, tree: TreeDataNode[]): React.Key => {
-  let parentKey: React.Key;
-  for (let i = 0; i < tree.length; i++) {
-    const node = tree[i];
-    if (node.children) {
-      if (node.children.some((item) => item.key === key)) {
-        parentKey = node.key;
-      } else if (getParentKey(key, node.children)) {
-        parentKey = getParentKey(key, node.children);
-      }
-    }
-  }
-  return parentKey!;
-};
-const defaultData: any = [];
+import { Flex, Input, Tree, TreeProps } from 'antd';
+import { Suspense, useEffect, useState } from 'react';
 
 const MenuTree = (props: { treeData: object[]; expandedKeys: string[]; [key: string]: any }) => {
-  // const [expandedKeys, setExpandedKeys] = useState<string[]>(props.expandedKeys);
+  //
   const [treeData, setTreeData] = useState<any[]>([]);
+  // 搜索关键字值储存位置
   const [searchValue, setSearchValue] = useState('');
-  const [autoExpandParent, setAutoExpandParent] = useState(true);
+
   // 监听treeData入参是否修改
   useEffect(() => {
     setTreeData(props.treeData);
   }, [props.treeData]);
 
-  useMemo(() => {
+  /**
+   * 监听搜索对象变化, 高亮搜索项
+   */
+  useEffect(() => {
+    const highlightTitle = (title: string, key: string): JSX.Element => {
+      const index = title.indexOf(searchValue);
+      if (index === -1) return <span key={key}>{title}</span>;
+
+      const beforeStr = title.substring(0, index);
+      const afterStr = title.slice(index + searchValue.length);
+
+      return (
+        <span key={key}>
+          {beforeStr}
+          <span className="site-tree-search-value" style={{ color: '#ff4d4f', fontWeight: 'bolder' }}>
+            {searchValue}
+          </span>
+          {afterStr}
+        </span>
+      );
+    };
+
     const loop = (data: any[]): any[] =>
-      data.map((item) => {
-        const strTitle = item.title as string;
-        const index = strTitle.indexOf(searchValue);
-        const beforeStr = strTitle.substring(0, index);
-        const afterStr = strTitle.slice(index + searchValue.length);
-        const title =
-          index > -1 ? (
-            <span key={item.key}>
-              {beforeStr}
-              <span className="site-tree-search-value" style={{ color: '#c01' }}>
-                {searchValue}
-              </span>
-              {afterStr}
-            </span>
-          ) : (
-            <span key={item.key}>{strTitle}</span>
-          );
+      data.map((item) => ({
+        ...item,
+        title: highlightTitle(item.title as string, item.key),
+        children: item.children ? loop(item.children) : undefined,
+      }));
 
-        // 递归处理子节点
-        if (item.children) {
-          return { ...item, title, children: loop(item.children) };
-        }
-
-        return {
-          ...item, // 保留其他属性
-          title, // 替换 title 为高亮版本
-        };
-      });
-    console.log(searchValue);
     setTreeData(loop(props.treeData));
   }, [searchValue]);
 
+  /**
+   *  检索数组,搜寻包含关键字的项并返回id及其父id
+   * @param data
+   * @param value
+   */
   const getSelectKeys = (data: any[], value: string): string[] => {
     return data.reduce((keys: string[], item) => {
-      if (item.title.indexOf(value) > -1) {
-        keys.push(item.id);
+      let childKeys: string[] = [];
+
+      // 递归查找子元素中的匹配项
+      if (item.children) {
+        childKeys = getSelectKeys(item.children, value);
       }
 
-      if (item.children) {
-        keys.push(...getSelectKeys(item.children, value)); // 使用扩展运算符代替 concat
+      // 如果当前项匹配，或者有子元素匹配，则把当前项的id加入结果中
+      if (item.title.indexOf(value) > -1 || childKeys.length > 0) {
+        keys.push(item.id);
       }
+      // 把子元素匹配的keys也加到结果中
+      keys.push(...childKeys);
+
       return keys;
     }, []);
   };
 
+  /**
+   * 快速搜索关键字,并展开对应的树结构
+   * 缓存搜索字段用于高亮搜索值
+   * @param value
+   */
   function onSearch(value: string) {
     const newExpandedKeys = getSelectKeys(props.treeData, value);
     props.onExpand(newExpandedKeys);
@@ -87,7 +87,7 @@ const MenuTree = (props: { treeData: object[]; expandedKeys: string[]; [key: str
    * @param info
    */
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
-    console.log('selected', selectedKeys, info);
+    props.onCheck(selectedKeys, info, 'isSelect');
   };
 
   /**
@@ -96,32 +96,26 @@ const MenuTree = (props: { treeData: object[]; expandedKeys: string[]; [key: str
    * @param info
    */
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
-    console.log('onCheck', checkedKeys, info);
+    props.onCheck(checkedKeys, info, 'isCheck');
   };
 
   return (
     <Suspense>
       <Flex gap="middle" vertical>
         <Input.Search placeholder="输入菜单名称搜素" onSearch={onSearch} />
-
         <Tree
           checkable
           showLine={true}
-          titleRender={(props) => {
-            // @ts-ignore
-            return TitleNode({ children: props.title, tag: props.type, icon: props.icon });
+          titleRender={({ title, type, icon }: any) => {
+            return TitleNode({ children: title, tag: type, icon: icon, setOperation: props.setOperation });
           }}
           expandedKeys={props.expandedKeys}
           onExpand={(expandedKeys) => props.onExpand(expandedKeys)}
-          // autoExpandParent={autoExpandParent}
           onSelect={onSelect}
           onCheck={onCheck}
           blockNode
           fieldNames={{ key: 'id' }}
           treeData={treeData}
-          // defaultExpandedKeys={['0-0-0', '0-0-1']}
-          // defaultSelectedKeys={['0-0-0', '0-0-1']}
-          // defaultCheckedKeys={['0-0-0', '0-0-1']}
         />
       </Flex>
     </Suspense>

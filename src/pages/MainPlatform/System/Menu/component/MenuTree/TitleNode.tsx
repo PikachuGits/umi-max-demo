@@ -3,27 +3,25 @@ import { LazyLoadable } from '@/components';
 import * as Icons from '@ant-design/icons';
 import { Dropdown, Tag } from 'antd';
 
-const items = [
-  {
-    label: '编辑',
-    key: '1',
-  },
-  {
-    label: '新增子菜单',
-    key: '2',
-  },
-  {
-    type: 'divider' as const,
-  },
-  {
-    label: '删除',
-    danger: true,
-    key: '3',
-  },
-];
-
 const TitleNode = (props: any) => {
-  // console.log('props', props.tag);
+  const items = [
+    {
+      label: '编辑',
+      key: 'edit',
+    },
+    {
+      label: '新增子菜单',
+      key: 'addSubset',
+    },
+    {
+      type: 'divider' as const,
+    },
+    {
+      label: '删除',
+      danger: true,
+      key: 'delete',
+    },
+  ];
   const tagType = ['菜单', '按钮'];
   const tagColor = ['success', 'processing'];
 

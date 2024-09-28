@@ -1,6 +1,6 @@
 // 错误处理方案： 错误类型
-import { CacheEnum } from '@/settings/enum';
-import { localStorageGet } from '@/utils/catch';
+import store from '@/store';
+import { handleLogout } from '@/store/actions';
 import { AxiosResponse, RequestConfig } from '@@/plugin-request/request';
 import { message, notification } from 'antd';
 
@@ -97,7 +97,7 @@ export const RequestSetting: RequestConfig = {
   requestInterceptors: [
     (config: any) => {
       // 设置token
-      config.headers.common.token = localStorageGet(CacheEnum.TOKEN);
+      config.headers.common.token = store.getState().user.token;
       // const url = config.url.concat('?token = 123');
       return { ...config };
     },
@@ -109,7 +109,8 @@ export const RequestSetting: RequestConfig = {
       // 拦截响应数据，进行个性化处理
       const { data } = response;
       if (data.code !== 10000) {
-        message.error('请求失败！').then((r) => r);
+        message.error(data.message).then((r) => r);
+        store.dispatch(handleLogout());
       }
       return data;
     },

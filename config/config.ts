@@ -1,6 +1,7 @@
 import { defineConfig } from '@umijs/max';
 import { routes } from './routes';
 
+// console.log(process.env);
 export default defineConfig({
   antd: {},
   access: {},
@@ -17,7 +18,8 @@ export default defineConfig({
   title: '建业管理平台',
   proxy: {
     '/api': {
-      target: 'http://192.168.1.140',
+      target: process.env.API_URL,
+      // target: 'http://bgpt.cn/backend',
       changeOrigin: true,
       pathRewrite: { '^/api': '' },
     },
@@ -27,6 +29,8 @@ export default defineConfig({
   routes,
   npmClient: 'pnpm',
   autoCSSModules: true,
+  // 是否开启https
+  // https: {},
   // 打包器
   mako: {},
 });

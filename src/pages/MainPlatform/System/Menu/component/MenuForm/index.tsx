@@ -4,7 +4,6 @@ import { classes_module } from '@/utils/class-module';
 import { isEmpty } from '@/utils/format';
 import Icons, * as AntdIcons from '@ant-design/icons';
 import { ProForm, ProFormGroup, ProFormInstance, ProFormRadio, ProFormText } from '@ant-design/pro-components';
-import { useSetState } from 'ahooks';
 import { message } from 'antd';
 import React, { Suspense, useRef, useState } from 'react';
 import styles from '../../styles/component/menu-form.less';
@@ -16,15 +15,15 @@ const waitTime = (time: number = 100) => {
     }, time);
   });
 };
+interface InitialValuesType {
+  node_type?: 1;
+  name?: '杰作';
+  icon?: '';
+}
 
-export default () => {
+export default ({ initialValues }: { initialValues: InitialValuesType }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
-  // , setInitialValues
-  const [initialValues] = useSetState({
-    node_type: 1,
-    name: '杰作',
-    icon: '',
-  });
+  //  form 对象
   const formRef = useRef<ProFormInstance>();
 
   /**+
@@ -49,12 +48,6 @@ export default () => {
       <Icons
         onClick={() => setPopoverOpen(!popoverOpen)}
         className={classes_module(styles, 'after-icon')}
-        // style={{
-        //   height: '30px',
-        //   width: '30px',
-        //   display: 'flex',
-        //   justifyContent: 'center',
-        // }}
         component={() => <More />}
       />
     </IconSelect>
@@ -66,17 +59,27 @@ export default () => {
         name: string;
         company?: string;
         useMode?: string;
+        initialValues?: InitialValuesType;
       }>
         formRef={formRef}
         labelCol={{ span: 6 }}
         labelAlign="right"
         layout={'horizontal'}
-        initialValues={initialValues}
+        initialValues={{ node_type: 1, ...initialValues }}
         grid={true}
         onFinish={async (values) => {
           await waitTime(2000);
           console.log(values);
           message.success('提交成功');
+        }}
+        submitter={{
+          searchConfig: {
+            resetText: '重置',
+            submitText: '保存修改',
+          },
+          render: (props, doms) => {
+            return <div className={classes_module(styles, 'form-button-group', 'button')}>{doms}</div>;
+          },
         }}
       >
         <ProFormGroup>

@@ -1,9 +1,9 @@
 import store from '@/store';
+import { handleLogout } from '@/store/actions';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { history, useModel } from '@umijs/max';
 import type { MenuProps } from 'antd';
 import { createStyles } from 'antd-style';
-import { stringify } from 'querystring';
 import React from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
@@ -42,22 +42,9 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, children }) =>
    * 退出登录，并且将当前的 url 保存
    */
   const loginOut = async () => {
-    store.dispatch({ type: 'user/loginOut' });
-
-    const { search, pathname } = window.location;
-    const urlParams = new URL(window.location.href).searchParams;
-    /** 此方法会跳转到 redirect 参数所在的位置 */
-    const redirect = urlParams.get('redirect');
-    // Note: There may be security issues, please note
-    if (window.location.pathname !== '/login' && !redirect) {
-      history.replace({
-        pathname: '/login',
-        search: stringify({
-          redirect: pathname + search,
-        }),
-      });
-    }
+    store.dispatch(handleLogout());
   };
+
   const { styles } = useStyles();
 
   const { initialState, setInitialState } = useModel('@@initialState');

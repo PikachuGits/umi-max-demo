@@ -26,7 +26,7 @@ let extraRoutes: Routes.RoutesMenuItem[] = [];
  *        plugin，运行时插件机制
  *        history，history 实例
  */
-export function rootContainer(container: any, args: any) {
+export function rootContainer(container: any) {
   return (
     <Suspense>
       <Provider store={store}>{container}</Provider>
@@ -48,12 +48,13 @@ export async function getInitialState(): Promise<InitialStateType> {
 }
 
 export const layout = ({ initialState, setInitialState }: any) => {
-  const contentDeviationX =
-    document.documentElement.offsetWidth > 767 ? (initialState?.collapsed ? '65px' : '256px') : '0px';
+  const defaultCollapsed = document.documentElement.offsetWidth <= 1000;
+  const isCollapsed = initialState?.collapsed !== undefined ? initialState.collapsed : defaultCollapsed;
+  const contentDeviationX = document.documentElement.offsetWidth > 767 ? (isCollapsed ? '65px' : '256px') : '0px';
 
   return {
     ...initialState,
-    collapsed: initialState?.collapsed,
+    collapsed: isCollapsed,
     onCollapse: (collapsed: boolean) => {
       setInitialState({ ...initialState, collapsed });
     },
@@ -65,17 +66,7 @@ export const layout = ({ initialState, setInitialState }: any) => {
     breadcrumbRender: (routers = []) => {
       return [...routers];
     },
-    // menu: {
-    //   // maskClosable: true,
-    //   loading: false,
-    //   locale: false,
-    //   request: async (params: object, defaultMenuData: object[]) => {
-    //     // console.log('params', params, defaultMenuData);
-    //     return defaultMenuData;
-    //   },
-    // },
     menu: false,
-    // menuRender: () => {},
   };
 };
 
