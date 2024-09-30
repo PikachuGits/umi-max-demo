@@ -22,7 +22,7 @@ export default () => {
         cardBordered
         scroll={{ x: '100%' }}
         request={async (params, sort, filter) => {
-          console.log(sort, filter);
+          // console.log(sort, filter);
           const { current, ...values } = params;
           return await getCompanyListToTable({
             ...values,
@@ -49,7 +49,8 @@ export default () => {
           pageSize: 10,
           // onChange: (page) => console.log('page', page),
         }}
-        additionalButtons={[<CompanyFormDrawer />]}
+        // additionalButtons={[<CompanyFormDrawer />]}
+        toolBarRender={() => [<CompanyFormDrawer />]}
       />
     </CustomPageContainer>
   );

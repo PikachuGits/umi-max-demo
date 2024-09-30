@@ -42,9 +42,6 @@ const ProEditable = forwardRef((props: CustomProTableProps<any>, ref) => {
 
   return (
     <ProTable
-      {...tableProps}
-      components={components}
-      columns={getTableColumns({ isEditable: editable, defaultColumns, handleSave })}
       toolBarRender={() => [
         <Button
           key="button"
@@ -58,6 +55,9 @@ const ProEditable = forwardRef((props: CustomProTableProps<any>, ref) => {
         </Button>,
         ...(additionalButtons || []),
       ]}
+      {...tableProps}
+      components={components}
+      columns={getTableColumns({ isEditable: editable, defaultColumns, handleSave })}
     />
   );
 });
