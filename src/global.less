@@ -9,6 +9,8 @@
 }
 .fadeOut {
   //animation: fadeOut 1s forwards;
+  //display:flex;
+  //flex-direction:row;
 }
 
 @keyframes fadeOut {
@@ -37,5 +39,73 @@
       width: 40% !important; // 第二块 div 占 40%
       flex: 0;
     }
+  }
+}
+
+.water-droplet {
+  display: block;
+  unicode-bidi: isolate;
+  width: 160px;
+  height: 168px;
+  border-radius: 100% 84% 96% 88% / 100% 84% 96% 88%;
+  transform: scale(1.1, 0.95);
+  position: relative;
+  background: radial-gradient(
+    ellipse at 22% 20%,
+    rgba(40, 50, 60, 1) 0,
+    rgba(35, 40, 70, 1) 28%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  box-shadow: 10px 10px 15px 5px rgba(0, 0, 0, 0.4), 5px 5px 6px rgba(0, 0, 0, 0.8), 15px 15px 40px rgba(0, 0, 0, 0.4),
+    15px 15px 60px rgba(0, 0, 0, 0.6), -3px -3px 5px rgba(255, 255, 255, 0.8) inset;
+  //animation: dynamic linear 4s infinite;
+  animation: bounce 3s infinite cubic-bezier(0.25, 0.1, 0.25, 1); /* Ease-out bounce effect */
+}
+
+.water-droplet:after {
+  content: '';
+  position: absolute;
+  width: 123px;
+  height: 90px;
+  background: transparent;
+  border-radius: 100% 95% 96% 90%;
+  top: 12px;
+  left: 12px;
+  box-shadow: 7px 19px 15px -10px #fff inset;
+  transform: rotate(-20deg);
+  filter: blur(1px);
+  //animation: dynamic linear 2s infinite;
+}
+
+.water-word {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 30px;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    border-radius: 100% 84% 96% 88% / 100% 84% 96% 88%;
+    transform: scale(1.1, 0.95);
+  }
+
+  20% {
+    /* 反弹向上，收缩并稍微拉长 */
+    border-radius: 100% 84% 96% 88% / 100% 84% 96% 88%;
+    transform: scale(0.95, 1.05);
+  }
+
+  50% {
+    border-radius: 100% 84% 96% 88% / 100% 84% 96% 88%;
+    transform: scale(1.1, 0.95);
+  }
+  70% {
+    /* 反弹向上，收缩并稍微拉长 */
+    border-radius: 100% 84% 96% 88% / 100% 84% 96% 88%;
+    transform: scale(0.95, 1.05);
   }
 }

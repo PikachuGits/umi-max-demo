@@ -1,10 +1,13 @@
 import { PageContainerSystem } from '@/settings';
 import { PageContainer } from '@ant-design/pro-components';
+import { forwardRef } from 'react';
 
-export default (props: any) => {
+export default forwardRef((props: any, ref: any) => {
   return (
-    <PageContainer {...PageContainerSystem} {...props}>
-      {props.children}
-    </PageContainer>
+    <div ref={ref}>
+      <PageContainer {...PageContainerSystem} {...props}>
+        {props.children}
+      </PageContainer>
+    </div>
   );
-};
+});
