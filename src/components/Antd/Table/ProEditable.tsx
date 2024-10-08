@@ -15,7 +15,6 @@ interface CustomProTableProps<T, U = Record<string, any>> extends ProTableProps<
 
 const ProEditable = forwardRef((props: CustomProTableProps<any>, ref) => {
   const { defaultColumns, handleSave, additionalButtons, ...tableProps } = props;
-
   const [editable, setEditable] = useState<boolean>(false);
   // 使用 useImperativeHandle 暴露给父组件的方法
   useImperativeHandle(ref, () => ({

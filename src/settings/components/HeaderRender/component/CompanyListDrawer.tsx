@@ -4,21 +4,6 @@ import { ProList } from '@ant-design/pro-components';
 import { Drawer, Input, Space, Tag, Typography } from 'antd';
 import React from 'react';
 
-const dataSource: GithubIssueItem[] = [
-  {
-    url: 'https://example.com/issue/1',
-    id: 1,
-    number: 1,
-    title: 'This is a very long title that should be truncated',
-    labels: [{ name: 'bug', color: 'red' }],
-    state: 'open',
-    comments: 5,
-    created_at: '2024-01-01',
-    updated_at: '2024-01-02',
-    ellipsis: true,
-  },
-];
-
 export default (props: any) => {
   const onClose = () => {
     props.setOpen(false);
@@ -50,17 +35,6 @@ export default (props: any) => {
           labelCol: { span: 0 }, // 自定义 label 的宽度
           size: 'middle',
           className: 'drawer-company-list-search',
-          // optionRender: (searchConfig, formProps, dom) => (
-          //   <div style={{ display: 'flex', alignItems: 'center', border: '1px solid' }}>
-          //     <Button type="primary" onClick={() => formProps?.form?.submit()} style={{ marginLeft: 8 }}>
-          //       搜索
-          //     </Button>
-          //     <Button onClick={() => formProps?.form?.resetFields()} style={{ marginLeft: 8 }}>
-          //       重置
-          //     </Button>
-          //   </div>
-          // ),
-          // style: { border: '1px solid', padding: '0' },
         }}
         metas={{
           title: {
@@ -117,27 +91,6 @@ export default (props: any) => {
             ],
             search: false,
           },
-          // status: {
-          //   search: false,
-          //   // 自己扩展的字段，主要用于筛选，不在列表中显示
-          //   title: '状态',
-          //   valueType: 'select',
-          //   valueEnum: {
-          //     all: { text: '全部', status: 'Default' },
-          //     open: {
-          //       text: '未解决',
-          //       status: 'Error',
-          //     },
-          //     closed: {
-          //       text: '已解决',
-          //       status: 'Success',
-          //     },
-          //     processing: {
-          //       text: '解决中',
-          //       status: 'Processing',
-          //     },
-          //   },
-          // },
         }}
       />
     </Drawer>
