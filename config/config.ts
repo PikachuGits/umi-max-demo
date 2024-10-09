@@ -31,5 +31,5 @@ export default defineConfig({
   // 是否开启https
   // https: {},
   // 打包器
-  // mako: {},
+  mako: {},
 });
