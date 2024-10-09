@@ -27,13 +27,46 @@ export async function getCompanyListToTable(
 }
 
 /**
- * 获取公司列表( table )
+ *   修改公司信息
  * @param data
  * @param options
  */
 export async function editCompanyInfo(data: Company, options?: { [key: string]: any }) {
   // 执行实际的 API 请求
   return request(API.editCompany, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data,
+    ...(options || {}),
+  });
+}
+/**
+ * 新增公司
+ * @param data
+ * @param options
+ */
+export async function addCompany(data: Company, options?: { [key: string]: any }) {
+  // 执行实际的 API 请求
+  return request(API.addCompany, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data,
+    ...(options || {}),
+  });
+}
+
+/**
+ * 删除公司
+ * @param data
+ * @param options
+ */
+export async function delCompany(data: Company, options?: { [key: string]: any }) {
+  // 执行实际的 API 请求
+  return request(API.delCompany, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

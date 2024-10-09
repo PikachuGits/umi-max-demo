@@ -67,6 +67,17 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <Form.Item style={{ margin: 0 }} name={dataIndex} rules={restProps?.rules}>
           <Input ref={inputRef} onPressEnter={save} />
+          {/*<Select*/}
+          {/*  defaultValue="lucy"*/}
+          {/*  style={{ width: 120 }}*/}
+          {/*  // onChange={handleChange}*/}
+          {/*  options={[*/}
+          {/*    { value: 'jack', label: 'Jack' },*/}
+          {/*    { value: 'lucy', label: 'Lucy' },*/}
+          {/*    { value: 'Yiminghe', label: 'yiminghe' },*/}
+          {/*    { value: 'disabled', label: 'Disabled', disabled: true },*/}
+          {/*  ]}*/}
+          {/*/>*/}
         </Form.Item>
         <EditActions onSave={save} onClose={() => setEditing(false)} />
       </div>

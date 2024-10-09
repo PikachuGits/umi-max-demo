@@ -1,4 +1,3 @@
-import { DeleteOutlined, FormOutlined } from '@ant-design/icons';
 import { Tag } from 'antd';
 import React from 'react';
 
@@ -50,7 +49,7 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
     title: '公司所在地',
     width: 300,
     ellipsis: true,
-    search: false,
+    // search: false,
     editable: true,
     dataIndex: 'address',
   },
@@ -58,13 +57,32 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
     title: '社会统一信用代码',
     dataIndex: 'tin',
     width: 200,
+    editable: true,
     search: false,
   },
   {
     title: '公司类型',
-    width: 100,
+    width: 200,
     dataIndex: 'company_type',
-    search: false,
+    // search: false,
+    editable: true,
+    valueType: 'select',
+    valueEnum: {
+      all: { text: '超长'.repeat(50) },
+      open: {
+        text: '未解决',
+        status: 'Error',
+      },
+      closed: {
+        text: '已解决',
+        status: 'Success',
+        disabled: true,
+      },
+      processing: {
+        text: '解决中',
+        status: 'Processing',
+      },
+    },
   },
   {
     title: '云盘排序',
@@ -74,23 +92,11 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
   },
   {
     title: '操作',
+    dataIndex: 'action',
     valueType: 'option',
     key: 'option',
     align: 'center',
     fixed: 'right',
     width: 100,
-    render: () => {
-      // text: string, record: object, _, action
-      return (
-        <div>
-          <a style={{ padding: '5px' }} key="editable" onClick={() => {}}>
-            <FormOutlined />
-          </a>
-          <a style={{ padding: '5px' }} key="delete" onClick={() => {}}>
-            <DeleteOutlined style={{ color: 'red' }} />
-          </a>
-        </div>
-      );
-    },
   },
 ];

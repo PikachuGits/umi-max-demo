@@ -1,64 +1,216 @@
-import { PlusOutlined } from '@ant-design/icons';
-import { DrawerForm, ProForm, ProFormDateRangePicker, ProFormSelect, ProFormText } from '@ant-design/pro-components';
-import { Button, message } from 'antd';
+import { addCompany, editCompanyInfo } from '@/services/company/CompanyController';
+import { DrawerForm, ProForm, ProFormText, ProFormUploadButton } from '@ant-design/pro-components';
+import { message } from 'antd';
+import { useEffect, useState } from 'react';
 
-export default () => {
+export default (props: any) => {
+  const [initialValues, setInitialValues] = useState({});
+  useEffect(() => {
+    console.log(props.initialValues);
+    setInitialValues({
+      ...props.initialValues,
+      logoBase64: [{ name: 'logo', url: props.initialValues?.logoBase64 }],
+    });
+  }, [props.initialValues]);
   return (
     <div>
       <DrawerForm
         // @ts-ignore
         labelWidth="auto"
-        trigger={
-          <Button type="primary">
-            <PlusOutlined />
-            创建公司
-          </Button>
-        }
+        trigger={props.trigger}
+        drawerProps={{ destroyOnClose: true }}
         onFinish={async (values: any) => {
-          console.log(values);
+          const formData = {
+            ...values,
+            logoBase64: values.logoBase64[0].thumbUrl, // Pass Base64 string to the backend
+          };
+
+          if (props.initialValues?.id) {
+            console.log(props.initialValues?.id, values);
+            await editCompanyInfo({ ...formData, id: props.initialValues?.id });
+          } else {
+            console.log('values', values.logoBase64);
+            await addCompany(formData);
+          }
+
           message.success('提交成功');
+          props.onChange();
+          return true;
         }}
-        initialValues={{
-          name: '蚂蚁设计有限公司',
-          useMode: 'chapter',
-        }}
+        initialValues={initialValues}
       >
         <ProForm.Group>
-          <ProFormText width="md" name="name" label="签约客户名称" tooltip="最长为 24 位" placeholder="请输入名称" />
-          <ProFormText width="md" name="company" label="我方公司名称" placeholder="请输入名称" />
-        </ProForm.Group>
-        <ProForm.Group>
-          <ProFormText name={['contract', 'name']} width="md" label="合同名称" placeholder="请输入名称" />
-          <ProFormDateRangePicker width="md" name={['contract', 'createTime']} label="合同生效时间" />
-        </ProForm.Group>
-        <ProForm.Group>
-          <ProFormSelect
-            options={[
+          <ProFormText
+            width="md"
+            name="company"
+            label="公司名称"
+            // tooltip="最长为 24 位"
+            placeholder="请输入公司名称"
+            rules={[
               {
-                value: 'chapter',
-                label: '盖章后生效',
+                required: true,
+                message: '请输入公司名称',
               },
             ]}
-            readonly
-            width="xs"
-            name="useMode"
-            label="合同约定生效方式"
           />
-          <ProFormSelect
-            width="xs"
-            options={[
+          <ProFormText
+            width="md"
+            name="company_type"
+            label="公司类型"
+            placeholder="请输入名称"
+            rules={[
               {
-                value: 'time',
-                label: '履行完终止',
+                required: true,
+                message: '请输入类型',
               },
             ]}
-            name="unusedMode"
-            label="合同约定失效效方式"
           />
+          <ProFormText
+            width="md"
+            name="short"
+            label="中文简称"
+            placeholder="请输入"
+            rules={[
+              {
+                required: true,
+                message: '请输入中文简称',
+              },
+            ]}
+          />
+          <ProFormText
+            width="md"
+            name="legalPerson"
+            label="法人"
+            placeholder="请输入"
+            rules={[
+              {
+                required: true,
+                message: '请输入法人',
+              },
+            ]}
+          />
+          <ProFormText
+            width="md"
+            name="legalPerson_id"
+            label="法人身份证号"
+            placeholder="请输入"
+            rules={[
+              {
+                required: true,
+                message: '请输入法人身份证号',
+              },
+            ]}
+          />
+          <ProFormText
+            width="md"
+            name="code"
+            label="企业简称"
+            placeholder="用于生成本公司项目编号只允许包含大写字母和数字"
+            rules={[
+              {
+                required: true,
+                message: '请输入企业简称',
+              },
+            ]}
+          />
+          <ProFormText
+            width="md"
+            name="mobile"
+            label="联系电话"
+            placeholder="请输入"
+            rules={[
+              {
+                required: true,
+                message: '请输入联系电话',
+              },
+            ]}
+          />
+          <ProFormText
+            width="md"
+            name="address"
+            label="地址"
+            placeholder="请输入"
+            rules={[
+              {
+                required: true,
+                message: '请输入地址',
+              },
+            ]}
+          />
+          <ProFormText
+            width="md"
+            name="tin"
+            label="社会统一信用代码"
+            placeholder="请输入"
+            rules={[
+              {
+                required: true,
+                message: '请输入社会统一信用代码',
+              },
+            ]}
+          />
+          <ProFormText
+            width="md"
+            name="sort"
+            label="云盘排序"
+            placeholder="请输入"
+            rules={[
+              {
+                required: true,
+                message: '请输入云盘排序',
+              },
+            ]}
+          />
+          <ProFormUploadButton
+            name="logoBase64"
+            label="上传logo"
+            rules={[
+              {
+                required: true,
+                message: '请上传logo',
+              },
+            ]}
+            max={1}
+            fieldProps={{
+              name: 'file',
+              listType: 'picture-card',
+            }}
+          />
+          {/*<ProFormUploadDragger name="logoBase64" label="拖拽上传" required={true} />*/}
+          {/*<ProFormUploadButton name="logo" label="拖拽上传" required={true} />*/}
         </ProForm.Group>
-        <ProFormText width="sm" name="id" label="主合同编号" />
-        <ProFormText name="project" width="md" disabled label="项目名称" initialValue="xxxx项目" />
-        <ProFormText width="xs" name="mangerName" disabled label="商务经理" initialValue="启途" />
+        {/*<ProForm.Group>*/}
+        {/*  <ProFormText name={['contract', 'name']} width="md" label="合同名称" placeholder="请输入名称" />*/}
+        {/*  <ProFormDateRangePicker width="md" name={['contract', 'createTime']} label="合同生效时间" />*/}
+        {/*</ProForm.Group>*/}
+        {/*<ProForm.Group>*/}
+        {/*  <ProFormSelect*/}
+        {/*    options={[*/}
+        {/*      {*/}
+        {/*        value: 'chapter',*/}
+        {/*        label: '盖章后生效',*/}
+        {/*      },*/}
+        {/*    ]}*/}
+        {/*    readonly*/}
+        {/*    width="xs"*/}
+        {/*    name="useMode"*/}
+        {/*    label="合同约定生效方式"*/}
+        {/*  />*/}
+        {/*  <ProFormSelect*/}
+        {/*    width="xs"*/}
+        {/*    options={[*/}
+        {/*      {*/}
+        {/*        value: 'time',*/}
+        {/*        label: '履行完终止',*/}
+        {/*      },*/}
+        {/*    ]}*/}
+        {/*    name="unusedMode"*/}
+        {/*    label="合同约定失效效方式"*/}
+        {/*  />*/}
+        {/*</ProForm.Group>*/}
+        {/*<ProFormText width="sm" name="id" label="主合同编号" />*/}
+        {/*<ProFormText name="project" width="md" disabled label="项目名称" initialValue="xxxx项目" />*/}
+        {/*<ProFormText width="xs" name="mangerName" disabled label="商务经理" initialValue="启途" />*/}
       </DrawerForm>
     </div>
   );
