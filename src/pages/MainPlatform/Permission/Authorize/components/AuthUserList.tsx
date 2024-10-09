@@ -59,7 +59,7 @@ export default (props: Props) => {
   return (
     <ProList<GithubIssueItem>
       search={{}}
-      headerTitle="公司授权列表"
+      headerTitle="用户授权列表"
       rowKey="name"
       request={async (params) => {
         const { current, ...values } = params;

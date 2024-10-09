@@ -10,7 +10,7 @@ export default (props: any) => {
   };
 
   return (
-    <Drawer title="快速进入公司入口" width={500} closable={false} placement="left" onClose={onClose} open={props.open}>
+    <Drawer title="快速进入公司入口" width={550} closable={false} placement="left" onClose={onClose} open={props.open}>
       <ProList<GithubIssueItem>
         search={{}}
         rowKey="name"
@@ -40,7 +40,7 @@ export default (props: any) => {
           title: {
             dataIndex: 'company',
             title: '公司名称',
-            render: (_, row) => {
+            render: (_) => {
               return (
                 <Typography.Text style={{ width: '180px' }} ellipsis={{ tooltip: _ }}>
                   {_}

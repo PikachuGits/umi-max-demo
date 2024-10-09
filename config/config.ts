@@ -19,7 +19,6 @@ export default defineConfig({
   proxy: {
     '/api': {
       target: process.env.API_URL,
-      // target: 'http://bgpt.cn/backend',
       changeOrigin: true,
       pathRewrite: { '^/api': '' },
     },
