@@ -1,6 +1,6 @@
 import { CustomPageContainer, ProEditable } from '@/components';
-import { defaultColumns } from '@/pages/MainPlatform/Company/List/config/table-columns';
-import { editCompanyInfo, getCompanyListToTable } from '@/services/company/CompanyController';
+import { defaultColumns } from '@/pages/MainPlatform/User/List/config/table-columns';
+import { getAdminList } from '@/services/user/UserController';
 import { PlusOutlined } from '@ant-design/icons';
 import { ActionType } from '@ant-design/pro-components';
 import { Button } from 'antd';
@@ -10,8 +10,8 @@ export default () => {
   const actionRef = useRef<ActionType>();
 
   async function handleSave(value: Company, record: Company) {
-    await editCompanyInfo({ ...value, id: record.id });
-    actionRef.current?.reload();
+    // await editCompanyInfo({ ...value, id: record.id });
+    // actionRef.current?.reload();
   }
 
   return (
@@ -25,12 +25,12 @@ export default () => {
         request={async (params, sort, filter) => {
           console.log(sort, filter);
           const { current, ...values } = params;
-          return await getCompanyListToTable({
+          return await getAdminList({
             ...values,
             page: current,
           });
         }}
-        rowKey="id"
+        rowKey="admin_id"
         options={{
           setting: {
             listsHeight: 400,

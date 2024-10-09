@@ -111,3 +111,98 @@ export async function deleteUser(
     ...(options || {}),
   });
 }
+
+/**
+ * 获取用户组列表( table )
+ * @param params
+ * @param options
+ */
+export async function getAdminGroupList(
+  params: {
+    page?: number;
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.getAdminGroupList, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params,
+    ...(options || {}),
+  });
+}
+/**
+ * 添加用户组
+ * @param data
+ * @param options
+ */
+export async function addAdminGroup(
+  data: {
+    page?: number;
+    pageSize?: number;
+    field_name: string;
+    ids: number[];
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.addAdminGroup, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data,
+    ...(options || {}),
+  });
+}
+/**
+ * 获取用户列表( table )
+ * @param params
+ * @param options
+ */
+export async function getAdminList(
+  params: {
+    page?: number;
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.getAdminList, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params,
+    ...(options || {}),
+  });
+}
+/**
+ * 获取已经在组中的用户回显
+ * @param data
+ * @param options
+ */
+export async function listGroupUsers(
+  data: {
+    filed_name?: string;
+    id?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.listGroupUsers, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data,
+    ...(options || {}),
+  });
+}

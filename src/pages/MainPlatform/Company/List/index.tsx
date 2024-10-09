@@ -2,8 +2,10 @@ import { CustomPageContainer, ProEditable } from '@/components';
 import { CompanyFormDrawer } from '@/pages/MainPlatform/Company/List/component';
 import { defaultColumns } from '@/pages/MainPlatform/Company/List/config/table-columns';
 import { editCompanyInfo, getCompanyListToTable } from '@/services/company/CompanyController';
+import { DeleteOutlined, FormOutlined, PlusOutlined } from '@ant-design/icons';
 import { ActionType } from '@ant-design/pro-components';
-import { useRef } from 'react';
+import { Button } from 'antd';
+import { useEffect, useRef } from 'react';
 
 export default () => {
   const actionRef = useRef<ActionType>();
@@ -12,6 +14,32 @@ export default () => {
     await editCompanyInfo({ ...value, id: record.id });
     actionRef.current?.reload();
   }
+  useEffect(() => {
+    defaultColumns.find((item) => {
+      if (item.dataIndex == 'action') {
+        item.render = (event: any) => {
+          // console.log('event', event.props);
+          // text: string, record: object, _, action
+          return (
+            <div style={{ display: 'flex' }}>
+              <a style={{ padding: '5px' }} key="editable">
+                <CompanyFormDrawer
+                  onChange={() => {
+                    actionRef.current?.reload();
+                  }}
+                  trigger={<FormOutlined />}
+                  initialValues={event.props.record}
+                />
+              </a>
+              <a style={{ padding: '5px' }} key="delete" onClick={() => {}}>
+                <DeleteOutlined style={{ color: 'red' }} />
+              </a>
+            </div>
+          );
+        };
+      }
+    });
+  }, []);
 
   return (
     <CustomPageContainer>
@@ -22,7 +50,7 @@ export default () => {
         cardBordered
         scroll={{ x: '100%' }}
         request={async (params, sort, filter) => {
-          console.log(sort, filter);
+          // console.log(sort, filter);
           const { current, ...values } = params;
           return await getCompanyListToTable({
             ...values,
@@ -49,7 +77,19 @@ export default () => {
           pageSize: 10,
           // onChange: (page) => console.log('page', page),
         }}
-        additionalButtons={[<CompanyFormDrawer />]}
+        additionalButtons={[
+          <CompanyFormDrawer
+            onChange={() => {
+              actionRef.current?.reload();
+            }}
+            trigger={
+              <Button type="primary">
+                <PlusOutlined />
+                创建公司
+              </Button>
+            }
+          />,
+        ]}
       />
     </CustomPageContainer>
   );
