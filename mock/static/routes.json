@@ -72,10 +72,32 @@
     "icon": "FastForwardOutlined",
     "children": [
       {
+        "id": "11",
         "name": "授权管理",
         "icon": "FastForwardOutlined",
         "path": "/main/permission/auth",
         "component": "pages/MainPlatform/Permission/Authorize"
+      },
+      {
+        "id": "12",
+        "name": "平台角色管理",
+        "icon": "FastForwardOutlined",
+        "path": "/main/permission/role/platfrom",
+        "component": "pages/MainPlatform/Permission/Role/Platform"
+      },
+      {
+        "id": "13",
+        "name": "公司角色管理",
+        "icon": "FastForwardOutlined",
+        "path": "/main/permission/role/company",
+        "component": "pages/MainPlatform/Permission/Role/Company"
+      },
+      {
+        "id": "14",
+        "name": "项目角色管理",
+        "icon": "FastForwardOutlined",
+        "path": "/main/permission/role/project",
+        "component": "pages/MainPlatform/Permission/Role/Project"
       }
     ]
   }

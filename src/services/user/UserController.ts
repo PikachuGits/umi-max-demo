@@ -185,6 +185,30 @@ export async function getAdminList(
   });
 }
 /**
+ * 删除用户组
+ * @param params
+ * @param options
+ */
+export async function delAdminGroup(
+  params: {
+    page?: number;
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.delAdminGroup, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params,
+    ...(options || {}),
+  });
+}
+/**
  * 获取已经在组中的用户回显
  * @param data
  * @param options

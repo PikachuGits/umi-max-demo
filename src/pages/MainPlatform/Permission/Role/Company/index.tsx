@@ -1,7 +1,7 @@
 import { CustomPageContainer, ProEditable } from '@/components';
-import { GroupFormDrawer } from '@/pages/MainPlatform/User/Group/component';
-import { defaultColumns } from '@/pages/MainPlatform/User/Group/config/table-columns';
-import { delAdminGroup, getAdminGroupList } from '@/services/user/UserController';
+import { RoleFormDrawer } from '@/pages/MainPlatform/Permission/Role/Company/component';
+import { defaultColumns } from '@/pages/MainPlatform/Permission/Role/Company/config/table-columns';
+import { delRole, getRoleList } from '@/services/role/RoleController';
 import { DeleteOutlined, FormOutlined, PlusOutlined } from '@ant-design/icons';
 import { ActionType } from '@ant-design/pro-components';
 import { Button } from 'antd';
@@ -14,17 +14,16 @@ export default () => {
     // await editCompanyInfo({ ...value, id: record.id });
     // actionRef.current?.reload();
   }
-
   useEffect(() => {
     defaultColumns.find((item) => {
       if (item.dataIndex == 'action') {
         item.render = (event: any) => {
-          console.log('event', '11111');
+          // console.log('event', event.props);
           // text: string, record: object, _, action
           return (
             <div style={{ display: 'flex' }}>
               <a style={{ padding: '5px' }} key="editable">
-                <GroupFormDrawer
+                <RoleFormDrawer
                   onChange={() => {
                     actionRef.current?.reload();
                   }}
@@ -36,8 +35,12 @@ export default () => {
                 style={{ padding: '5px' }}
                 key="delete"
                 onClick={() => {
-                  console.log('event', event.props.record.id);
-                  delAdminGroup({});
+                  delRole({
+                    role_id: event.props.record.role_id,
+                    platform_id: '2',
+                  }).then(() => {
+                    actionRef.current?.reload();
+                  });
                 }}
               >
                 <DeleteOutlined style={{ color: 'red' }} />
@@ -45,8 +48,6 @@ export default () => {
             </div>
           );
         };
-      } else {
-        console.log('event', '22222');
       }
     });
   }, []);
@@ -54,20 +55,20 @@ export default () => {
   return (
     <CustomPageContainer>
       <ProEditable
-        handleSave={handleSave}
         defaultColumns={defaultColumns}
         actionRef={actionRef}
         cardBordered
         scroll={{ x: '100%' }}
         request={async (params, sort, filter) => {
-          console.log(sort, filter);
+          // console.log(sort, filter);
           const { current, ...values } = params;
-          return await getAdminGroupList({
+          return await getRoleList({
             ...values,
             page: current,
+            platform_id: '2',
           });
         }}
-        rowKey="id"
+        rowKey="role_id"
         options={{
           setting: {
             listsHeight: 400,
@@ -88,31 +89,18 @@ export default () => {
           // onChange: (page) => console.log('page', page),
         }}
         toolBarRender={() => [
-          <GroupFormDrawer
+          <RoleFormDrawer
             onChanfe={() => {
               actionRef.current?.reload();
             }}
             trigger={
               <Button type="primary">
                 <PlusOutlined />
-                添加用户组
+                添加角色
               </Button>
             }
           />,
         ]}
-        // additionalButtons={[
-        //   <GroupFormDrawer
-        //     onChange={() => {
-        //       actionRef.current?.reload();
-        //     }}
-        //     trigger={
-        //       <Button type="primary">
-        //         <PlusOutlined />
-        //         添加用户组
-        //       </Button>
-        //     }
-        //   />,
-        // ]}
       />
     </CustomPageContainer>
   );

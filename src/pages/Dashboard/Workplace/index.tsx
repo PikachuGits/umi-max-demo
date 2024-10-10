@@ -1,28 +1,53 @@
-import { PageContainer, ProCard, Statistic } from '@ant-design/pro-components';
-import { useState } from 'react';
-const { Divider } = ProCard;
+import { getCompanyListToTable } from '@/services/company/CompanyController';
+import { useRequest } from '@@/exports';
+import { ProCard } from '@ant-design/pro-components';
+import { useEffect, useState } from 'react';
 
-export default function Workplace({ children }: any) {
-  const [responsive, setResponsive] = useState(false);
+export default () => {
+  const [cardData, setCardData] = useState<any[]>([]); // 存储公司数据
+  const { data, error, loading } = useRequest(() => {
+    return getCompanyListToTable({});
+  });
+  useEffect(() => {
+    if (!loading) {
+      setCardData(data);
+    }
+    // fetchCompanyList().then(() => {}); // 组件加载时获取公司列表
+  }, [loading]);
+
+  // async function fetchCompanyList() {
+  //   try {
+  //     const result = await getCompanyListToTable({});
+  //     console.log(result.data);
+  //     setCardData(result.data);
+  //     console.log('cardData', cardData);
+  //   } catch (error) {
+  //     console.error('获取公司列表失败:', error);
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   console.log('Updated cardData:', cardData); // 打印 cardData 更新后的值
+  // }, [cardData]); // 监听 cardData 的变化
+
   return (
-    <PageContainer breadcrumbRender={false} title={false}>
-      <ProCard.Group title="核心指标" direction={responsive ? 'column' : 'row'}>
-        <ProCard>
-          <Statistic title="今日UV" value={79.0} precision={2} />
-        </ProCard>
-        <Divider type={responsive ? 'horizontal' : 'vertical'} />
-        <ProCard>
-          <Statistic title="冻结金额" value={112893.0} precision={2} />
-        </ProCard>
-        <Divider type={responsive ? 'horizontal' : 'vertical'} />
-        <ProCard>
-          <Statistic title="信息完整度" value={93} suffix="/ 100" />
-        </ProCard>
-        <Divider type={responsive ? 'horizontal' : 'vertical'} />
-        <ProCard>
-          <Statistic title="冻结金额" value={112893.0} />
-        </ProCard>
-      </ProCard.Group>
-    </PageContainer>
+    <>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+        {cardData.map((card, index) => (
+          <ProCard
+            key={card.id} // 使用 card.id 作为 key，确保唯一性
+            title={'公司'} // 使用公司名称作为标题
+            extra="extra"
+            tooltip="这是提示"
+            style={{ width: 'calc(25% - 16px)', boxShadow: 'var(--ant-box-shadow-base)' }} // 每行四个卡片
+            boxShadow
+          >
+            <div>{card.company}</div>
+            <div>{card.address}</div>
+            {/* 使用公司地址 */}
+          </ProCard>
+        ))}
+      </div>
+    </>
   );
-}
+};

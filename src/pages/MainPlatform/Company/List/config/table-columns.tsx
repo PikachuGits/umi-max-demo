@@ -29,14 +29,6 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
     align: 'center',
     width: 250,
     // tooltip: '标题过长会自动收缩',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
   },
   {
     title: '企业简称(英文)',
