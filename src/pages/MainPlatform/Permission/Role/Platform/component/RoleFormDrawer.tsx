@@ -16,7 +16,6 @@ export default (props: any) => {
     console.log(props.initialValues);
     setInitialValues({
       ...props.initialValues,
-      logoBase64: [{ name: 'logo', url: props.initialValues?.logoBase64 }],
     });
   }, [props.initialValues]);
 
@@ -68,8 +67,9 @@ export default (props: any) => {
         onOpenChange={onOpenChange}
         drawerProps={{ destroyOnClose: true }}
         onFinish={async (values: any) => {
-          if (isEmpty(props.initialValues?.id)) {
+          if (isEmpty(props.initialValues?.role_id)) {
             await addRole({ ...values, menu: selectTreeData, platform_id: '1' });
+            return true;
           } else {
             await editRole({
               ...values,

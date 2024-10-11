@@ -68,8 +68,9 @@ export default (props: any) => {
         onOpenChange={onOpenChange}
         drawerProps={{ destroyOnClose: true }}
         onFinish={async (values: any) => {
-          if (isEmpty(props.initialValues?.id)) {
+          if (isEmpty(props.initialValues?.role_id)) {
             await addRole({ ...values, menu: selectTreeData, platform_id: '3' });
+            return true;
           } else {
             await editRole({
               ...values,

@@ -1,6 +1,5 @@
 // 错误处理方案： 错误类型
 import store from '@/store';
-import { handleLogout } from '@/store/actions';
 import { AxiosResponse, RequestConfig } from '@@/plugin-request/request';
 import { message, notification } from 'antd';
 
@@ -109,8 +108,8 @@ export const RequestSetting: RequestConfig = {
       // 拦截响应数据，进行个性化处理
       const { data } = response;
       if (data.code !== 10000) {
-        message.error(data.message).then((r) => r);
-        store.dispatch(handleLogout());
+        // message.error(data.message).then((r) => r);
+        // store.dispatch(handleLogout());
       }
       return data;
     },

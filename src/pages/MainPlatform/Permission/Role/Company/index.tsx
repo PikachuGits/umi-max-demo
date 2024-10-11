@@ -2,18 +2,21 @@ import { CustomPageContainer, ProEditable } from '@/components';
 import { RoleFormDrawer } from '@/pages/MainPlatform/Permission/Role/Company/component';
 import { defaultColumns } from '@/pages/MainPlatform/Permission/Role/Company/config/table-columns';
 import { delRole, getRoleList } from '@/services/role/RoleController';
+import { isEmpty } from '@/utils/format';
+import { useSearchParams } from '@@/exports';
 import { DeleteOutlined, FormOutlined, PlusOutlined } from '@ant-design/icons';
-import { ActionType } from '@ant-design/pro-components';
 import { Button } from 'antd';
 import { useEffect, useRef } from 'react';
 
 export default () => {
-  const actionRef = useRef<ActionType>();
+  const actionRef = useRef<any>();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   async function handleSave(value: Company, record: Company) {
     // await editCompanyInfo({ ...value, id: record.id });
     // actionRef.current?.reload();
   }
+
   useEffect(() => {
     defaultColumns.find((item) => {
       if (item.dataIndex == 'action') {
@@ -59,6 +62,19 @@ export default () => {
         actionRef={actionRef}
         cardBordered
         scroll={{ x: '100%' }}
+        onDataSourceChange={(dataSource) => {
+          console.log('dataSource', dataSource);
+          const { current, pageSize } = actionRef.current.pageInfo;
+
+          if (parseInt(current) > 1 && isEmpty(dataSource)) {
+            console.log('dataSource', { current: `${parseInt(current) - 1}`, pageSize });
+            actionRef.current?.setPageInfo({
+              ...actionRef.current.pageInfo,
+              current: `${parseInt(current) - 1}`,
+            });
+            actionRef.current?.reload();
+          }
+        }}
         request={async (params, sort, filter) => {
           // console.log(sort, filter);
           const { current, ...values } = params;
@@ -85,8 +101,8 @@ export default () => {
           },
         }}
         pagination={{
-          pageSize: 10,
-          // onChange: (page) => console.log('page', page),
+          pageSize: 1,
+          onChange: (page) => {},
         }}
         toolBarRender={() => [
           <RoleFormDrawer

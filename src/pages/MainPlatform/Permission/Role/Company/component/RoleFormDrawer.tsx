@@ -64,12 +64,15 @@ export default (props: any) => {
       <DrawerForm
         // @ts-ignore
         labelWidth="auto"
+        width={600}
         trigger={props.trigger}
         onOpenChange={onOpenChange}
         drawerProps={{ destroyOnClose: true }}
         onFinish={async (values: any) => {
-          if (isEmpty(props.initialValues?.id)) {
+          console.log('id', props.initialValues?.role_id);
+          if (isEmpty(props.initialValues?.role_id)) {
             await addRole({ ...values, menu: selectTreeData, platform_id: '2' });
+            return true;
           } else {
             await editRole({
               ...values,
@@ -86,7 +89,7 @@ export default (props: any) => {
       >
         <ProForm.Group>
           <ProFormText
-            width="md"
+            width="lg"
             name="role_name"
             label="角色名称"
             // tooltip="最长为 24 位"
@@ -101,7 +104,7 @@ export default (props: any) => {
         </ProForm.Group>
         <ProForm.Group>
           <ProFormSelect
-            width="md"
+            width="lg"
             name="status"
             label="状态"
             options={[
@@ -123,26 +126,28 @@ export default (props: any) => {
           />
         </ProForm.Group>
         <ProForm.Group>
-          <ProFormTextArea width="md" name="remarks" label="备注" placeholder="请输入" />
+          <ProFormTextArea width="lg" name="remarks" label="备注" placeholder="请输入" />
         </ProForm.Group>
-        <ProForm.Group>
-          <Tree
-            checkable
-            showLine={true}
-            titleRender={({ title, type, icon }: any) => {
-              return TitleNode({ children: title, tag: type, icon: icon, setOperation: props.setOperation });
-            }}
-            expandedKeys={expandedKeys}
-            onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
-            onSelect={onSelect}
-            onCheck={onCheck}
-            selectable={true}
-            checkedKeys={selectTreeData}
-            blockNode
-            fieldNames={{ key: 'id' }}
-            treeData={treeData}
-          />
-        </ProForm.Group>
+        <span>菜单权限</span>
+        <Tree
+          checkable
+          showLine={true}
+          titleRender={({ title, type, icon }: any) => {
+            return TitleNode({ children: title, tag: type, icon: icon, setOperation: props.setOperation });
+          }}
+          expandedKeys={expandedKeys}
+          onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
+          onSelect={onSelect}
+          onCheck={onCheck}
+          selectable={true}
+          checkedKeys={selectTreeData}
+          blockNode
+          fieldNames={{ key: 'id' }}
+          treeData={treeData}
+        />
+        {/*<ProForm.Group title={'菜单权限'}>*/}
+
+        {/*</ProForm.Group>*/}
       </DrawerForm>
     </div>
   );

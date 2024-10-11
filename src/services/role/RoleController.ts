@@ -46,11 +46,11 @@ export async function queryUserList(
 
 /**
  * 获取角色列表( table )
- * @param params
+ * @param data
  * @param options
  */
 export async function getRoleList(
-  params: {
+  data: {
     page?: number;
     pageSize?: number;
     current?: number;
@@ -61,11 +61,11 @@ export async function getRoleList(
 ) {
   // 执行实际的 API 请求
   return request(API.getRoleList, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    params,
+    data,
     ...(options || {}),
   });
 }
