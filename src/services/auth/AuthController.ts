@@ -10,6 +10,7 @@ export async function getUserPlatformRelationsByUser(
   params: {
     page?: number;
     pageSize?: number;
+    query_all?: number;
     id: number | string;
     platform_id: number | string;
   },

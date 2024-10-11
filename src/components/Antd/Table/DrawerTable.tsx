@@ -2,9 +2,10 @@ import { ProTable } from '@ant-design/pro-components';
 import { Drawer } from 'antd';
 import { cloneElement, Suspense, useEffect, useState } from 'react';
 const DrawerTable = (props: any) => {
-  const { trigger, drawerProps, ...tableProps } = props;
+  const { trigger, drawerProps, onOpenChange, ...tableProps } = props;
   const [open, setOpen] = useState(false);
   const showDrawer = () => {
+    onOpenChange();
     setOpen(true);
   };
   useEffect(() => {

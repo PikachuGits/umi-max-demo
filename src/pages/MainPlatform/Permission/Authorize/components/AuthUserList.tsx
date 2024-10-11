@@ -1,6 +1,7 @@
 import { GithubIssueItem } from '@/pages/MainPlatform/Company/List/typings';
 import { AuthDrawerTable } from '@/pages/MainPlatform/Permission/Authorize/components/index';
 import { calculateColumn } from '@/pages/MainPlatform/Permission/Authorize/config';
+import { userColumns } from '@/pages/MainPlatform/Permission/Authorize/config/auth-user-columns';
 import { getRoleList, getUserPlatformRelationsByUser } from '@/services/auth/AuthController';
 import { getAdminList } from '@/services/user/UserController';
 import { onConvertCheckBox } from '@/utils/format';
@@ -41,9 +42,19 @@ export default (props: Props) => {
     return Object.fromEntries(searchParams.entries());
   }, [searchParams]);
 
-  const { data, error, loading } = useRequest(getRoleList, {
+  const { data: adminIds, loading: loadingToIds } = useRequest(getUserPlatformRelationsByUser, {
+    defaultParams: [{ platform_id: platform_id, query_all: 1, id: platform_entity_id }],
+  });
+  const selectedRowKeys = useMemo(() => {
+    if (loadingToIds) return [];
+    console.log(adminIds);
+    return adminIds;
+  }, [loadingToIds]);
+
+  const { data, loading } = useRequest(getRoleList, {
     defaultParams: [{ platform_id: 2, query_all: 1 }],
   });
+
   const roleOptions = useMemo(() => {
     if (loading) return [];
     return onConvertCheckBox(data, { label: 'role_name', value: 'role_id' });
@@ -168,7 +179,7 @@ export default (props: Props) => {
           search: false,
         },
       }}
-      toolBarRender={() => {
+      toolBarRender={(event, row) => {
         return [
           level === '2' && (
             <AuthDrawerTable
@@ -178,6 +189,16 @@ export default (props: Props) => {
                 </Button>
               }
               title={'绑定用户'}
+              columns={userColumns}
+              rowKey={'admin_id'}
+              request={async (params: any) => {
+                const { current, ...values } = params;
+                return await getAdminList({
+                  ...values,
+                  page: current,
+                });
+              }}
+              selectedRowKeys={selectedRowKeys}
             ></AuthDrawerTable>
           ),
         ];
