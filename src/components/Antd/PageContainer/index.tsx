@@ -20,7 +20,6 @@ const CustomPageContainer = forwardRef((props: any, ref: any) => {
   useEffect(() => {
     // 监测到防抖后的尺寸变化时调用 props 传递的 onResize
     if (props.onResize) {
-      // console.log('debouncedSize', debouncedSize);
       props.onResize(debouncedSize);
     }
   }, [debouncedSize]);
@@ -35,10 +34,8 @@ const CustomPageContainer = forwardRef((props: any, ref: any) => {
           const { width, height } = entry.contentRect;
           // 如果 ref 当前有效，调用父组件传入的回调来更新宽高
           if (ref && typeof ref === 'object' && ref.current) {
-            // props.onResize?.({ width, height });
             // 更新当前尺寸
             setSize({ width, height });
-            console.log(width, height);
           }
         }
       });

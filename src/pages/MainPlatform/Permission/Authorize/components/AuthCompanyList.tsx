@@ -1,9 +1,11 @@
 import { GithubIssueItem } from '@/pages/MainPlatform/Company/List/typings';
+import { calculateColumn } from '@/pages/MainPlatform/Permission/Authorize/config';
 import { getCompanyListToTable } from '@/services/company/CompanyController';
 import { ProList } from '@ant-design/pro-components';
 import { useSearchParams } from '@umijs/max';
 import { Space, Tag, Typography } from 'antd';
 import { useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 interface Props {
   containerStyle: {
     width: number;
@@ -22,13 +24,8 @@ interface Props {
  */
 
 export default (props: Props) => {
-  const calculateColumn = (width: number) => {
-    console.log(width);
-    if (width > 1600) return 4;
-    if (width > 1100) return 3;
-    if (width > 780) return 2;
-    return 1;
-  };
+  const dispatch = useDispatch();
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const column = useMemo(() => calculateColumn(props.containerStyle.width), [props.containerStyle.width]);
@@ -37,9 +34,13 @@ export default (props: Props) => {
     return props.containerStyle.width / (column * 2) - 50 + 'px';
   }, [props.containerStyle.width, column]);
 
-  const checkToObject = (type: string, id: number) => {
-    const queryParamsArray = Object.fromEntries(searchParams.entries());
-    console.log(type, id, queryParamsArray);
+  const checkToObject = (type: string, row: any) => {
+    const searchParamsObj = Object.fromEntries(searchParams.entries());
+    const { level } = searchParamsObj;
+    dispatch({
+      type: 'auth/setAuthLevel',
+      payload: { level, info: { name: row.company, type: type, ...searchParamsObj } },
+    });
     /**
      * level 选择等级
      * platform_id 对应平台id
@@ -48,11 +49,11 @@ export default (props: Props) => {
      * type 对应当前应该查询的页面
      */
     setSearchParams({
-      level: '',
-      platform_id: '',
-      platform_entity_id: '',
+      level: `${parseInt(level) + 1}`,
+      platform_id: `2`,
+      platform_entity_id: `${row?.id}`,
       admin_id: '',
-      type: '',
+      type: type,
     });
   };
 
@@ -72,7 +73,7 @@ export default (props: Props) => {
         pageSize: 5,
         size: 'small',
       }}
-      showActions="always"
+      showActions="hover"
       form={{
         layout: 'inline',
         size: 'middle',
@@ -117,10 +118,10 @@ export default (props: Props) => {
           render: (text, row) => {
             // console.log(row);
             return [
-              <a key="user" onClick={() => checkToObject('user', row.id)}>
+              <a key="user" onClick={() => checkToObject('user', row)}>
                 授权用户
               </a>,
-              <a key="project" onClick={() => checkToObject('project', row.id)}>
+              <a key="project" onClick={() => checkToObject('project', row)}>
                 授权项目
               </a>,
             ];

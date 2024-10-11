@@ -1,5 +1,6 @@
 import PlatformEnum from '@/settings/enum/PlatformEnum';
 import UserEnum from '@/settings/enum/UserEnum';
+import { AuthorizeEnum } from '@/settings/enum/index';
 /**
  * 缓存命名规范
  */
@@ -12,6 +13,8 @@ enum CacheEnum {
   PLATFORM_NAME = PlatformEnum.NAME,
   // 缓存用户组名称
   USER_NAME = UserEnum.NAME,
+
+  AUTHORIZE_NAME = AuthorizeEnum.NAME,
   /**
    * 当前位置-平台类型id
    * ( 1:总平台 | 2:公司平台 | 3:项目平台  )

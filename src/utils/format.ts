@@ -31,3 +31,11 @@ export function isEmpty(
     (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)
   );
 }
+
+export function onConvertCheckBox(data: any[], { label, value }: { label: string; value: string }) {
+  if (isEmpty(data)) return;
+  return data.reduce((arr, obj) => {
+    arr.push({ label: obj[label], value: obj[value] });
+    return arr;
+  }, []);
+}

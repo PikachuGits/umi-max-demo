@@ -1,54 +1,31 @@
 import { CustomPageContainer } from '@/components';
+import { AuthorizeEnum } from '@/settings/enum';
+import store from '@/store';
 import { isEmpty } from '@/utils/format';
 import { useSearchParams } from '@@/exports';
-import { Link } from '@umijs/max';
-import { motion } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
+import { Button } from 'antd';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { AuthCompanyList, AuthProjectList, AuthUserList } from './components';
 import './index.less';
 
-const Card = ({ id, title, onClick, isSelected, containerStyle, children }) => {
-  const cardStyle = {
-    backgroundColor: isSelected ? '#4d90fe' : '#ccc',
-    // width: isSelected ? containerStyle.width : 150,
-    // height: isSelected ? containerStyle.height : 150,
-  };
-  const openSpring = { type: 'spring', stiffness: 200, damping: 30 };
-  const closeSpring = { type: 'spring', stiffness: 300, damping: 35 };
-
-  return (
-    <motion.div
-      layout
-      onClick={onClick}
-      className={`card ${isSelected ? 'open' : ''}`}
-      style={cardStyle}
-      initial={{ borderRadius: 10 }}
-      animate={{}}
-      transition={{}}
-    >
-      {children}
-    </motion.div>
-  );
-};
-const Overlay = ({ isSelected, style }) => {
-  console.log(isSelected);
-  return (
-    <motion.div
-      initial={false}
-      animate={{ opacity: isSelected ? 1 : 0 }}
-      transition={{ duration: 0.2 }}
-      style={{ pointerEvents: isSelected ? 'auto' : 'none', ...style }}
-      className="overlay"
-    >
-      <Link to="/main/permission/auth" style={{ display: 'inline-block', ...style }}>
-        123
-      </Link>
-    </motion.div>
-  );
-};
 const AfterChildrenExample: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [type, setType] = useState('user');
+  const dispatch = useDispatch();
+  function onCleanState() {
+    setSearchParams({});
+    dispatch({ type: 'auth/cleanState' });
+  }
+  useEffect(() => {
+    return () => {
+      onCleanState();
+    };
+  }, []);
+
+  const checkedList = useMemo(() => {
+    return store.getState()[AuthorizeEnum.NAME][AuthorizeEnum.LEVEL];
+  }, [store.getState()[AuthorizeEnum.NAME][AuthorizeEnum.LEVEL]]);
 
   useEffect(() => {
     /**
@@ -58,32 +35,20 @@ const AfterChildrenExample: React.FC = () => {
      * admin_id 用户id
      * type 对应当前应该查询的页面
      */
-    const queryParamsArray = Object.fromEntries(searchParams.entries());
-    console.log(searchParams);
-    if (isEmpty(queryParamsArray.type)) {
-      setSearchParams({
-        level: '1',
-        type: 'company',
-      });
-      setType('company');
-    } else {
-      setType(queryParamsArray.type);
+    const { level, type } = Object.fromEntries(searchParams.entries());
+    if (isEmpty(type)) {
+      setSearchParams({ level: '1', type: 'company' });
+      // 检测方法,如果因为某些原因导致checkedList 没有获取到相应的值,则无法进入后续步骤页面
+    } else if (parseInt(level) > 1 && isEmpty(checkedList[parseInt(level) - 2])) {
+      onCleanState();
     }
+    setType(type);
+    console.log(level, type);
   }, [searchParams]);
 
   const containerRef = useRef<any>(null); // 内部使用的 ref
-  const [selectedId, setSelectedId] = useState<string | number | null>(null);
-
-  const toggleSelect = (id: number) => {
-    setSelectedId(selectedId === id ? null : id);
-  };
 
   const [containerStyle, setContainer] = useState({
-    width: 0,
-    height: 0,
-  });
-
-  const [overlayStyle, setOverlayStyle] = useState({
     width: 0,
     height: 0,
   });
@@ -94,20 +59,35 @@ const AfterChildrenExample: React.FC = () => {
     // 32 为 pageContainer 上下左右的padding 宽度
     if (width !== 0 || height !== 0) {
       setContainer({ width: -32 * 2 + width, height: -32 * 2 + height });
-      setOverlayStyle({ width, height });
+      // setOverlayStyle({ width, height });
     }
   };
 
-  useEffect(() => {
-    // 页面加载时立即获取尺寸
-    if (containerRef.current) {
-      // const size = containerRef.current.getSize();
-      // handleResize(size);
-    }
-  }, []);
+  function onCloseButton(data: any) {
+    const { level, platform_id, platform_entity_id, admin_id, type } = data;
+    dispatch({ type: 'auth/removeAuthLevel', payload: { level } });
+    setSearchParams({ level, platform_id, platform_entity_id, admin_id, type });
+  }
 
   return (
     <CustomPageContainer ref={containerRef} onResize={handleResize} loading={containerStyle.height === 0}>
+      {checkedList?.map((item: any, key: number) => {
+        return (
+          !isEmpty(item) && (
+            <Button
+              key={key}
+              type="dashed"
+              style={{ padding: '6px 10px', margin: '0 10px 10px 10px' }}
+              // icon={<CloseOutlined  />}
+              onClick={() => onCloseButton(item)}
+              iconPosition={'end'}
+              size={'large'}
+            >
+              <span>{item.name}</span>
+            </Button>
+          )
+        );
+      })}
       {type === 'company' && <AuthCompanyList containerStyle={containerStyle}></AuthCompanyList>}
       {type === 'project' && <AuthProjectList containerStyle={containerStyle}></AuthProjectList>}
       {type === 'user' && <AuthUserList containerStyle={containerStyle}></AuthUserList>}

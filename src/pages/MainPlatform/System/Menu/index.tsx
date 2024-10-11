@@ -1,6 +1,7 @@
+import { CustomPageContainer } from '@/components';
 import { MenuForm, MenuHeader, MenuTree } from '@/pages/MainPlatform/System/Menu/component';
 import { EditTwoTone } from '@ant-design/icons';
-import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { ProCard } from '@ant-design/pro-components';
 import { Alert } from 'antd';
 import { Suspense, useEffect, useState } from 'react';
 import { data } from './data';
@@ -74,7 +75,7 @@ export default () => {
   };
 
   return (
-    <PageContainer
+    <CustomPageContainer
       breadcrumbRender={false}
       title={false}
       style={{ background: 'transparent' }}
@@ -117,6 +118,6 @@ export default () => {
           <MenuForm initialValues={menuItem} />
         </ProCard>
       </ProCard>
-    </PageContainer>
+    </CustomPageContainer>
   );
 };

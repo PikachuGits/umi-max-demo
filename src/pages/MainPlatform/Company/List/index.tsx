@@ -18,8 +18,6 @@ export default () => {
     defaultColumns.find((item) => {
       if (item.dataIndex === 'action') {
         item.render = (event: any) => {
-          // console.log('event', event.props);
-          // text: string, record: object, _, action
           return (
             <div style={{ display: 'flex' }}>
               <a style={{ padding: '5px' }} key="editable">
@@ -38,6 +36,7 @@ export default () => {
           );
         };
       }
+      return item;
     });
   }, []);
 

@@ -61,6 +61,8 @@ export const layout = ({ initialState, setInitialState }: any) => {
     contentStyle: {
       width: `calc(100vw - ${contentDeviationX})`,
       height: 'calc(100vh - 56px)',
+      // padding: '32px 40px',
+      // paddingRight: `50px`,
     },
     // headerContentRender: () => <ProBreadcrumb />,
     breadcrumbRender: (routers = []) => {

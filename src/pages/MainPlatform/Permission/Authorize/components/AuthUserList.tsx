@@ -1,9 +1,15 @@
 import { GithubIssueItem } from '@/pages/MainPlatform/Company/List/typings';
-import { getCompanyListToTable } from '@/services/company/CompanyController';
+import { AuthDrawerTable } from '@/pages/MainPlatform/Permission/Authorize/components/index';
+import { calculateColumn } from '@/pages/MainPlatform/Permission/Authorize/config';
+import { getRoleList, getUserPlatformRelationsByUser } from '@/services/auth/AuthController';
+import { getAdminList } from '@/services/user/UserController';
+import { onConvertCheckBox } from '@/utils/format';
 import { ProList } from '@ant-design/pro-components';
 import { useSearchParams } from '@umijs/max';
-import { Space, Tag, Typography } from 'antd';
+import { useRequest } from 'ahooks';
+import { Button, Checkbox, Space, Tag, Typography } from 'antd';
 import { useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 interface Props {
   containerStyle: {
     width: number;
@@ -22,14 +28,8 @@ interface Props {
  */
 
 export default (props: Props) => {
-  const calculateColumn = (width: number) => {
-    console.log(width);
-    if (width > 1600) return 4;
-    if (width > 1100) return 3;
-    if (width > 780) return 2;
-    return 1;
-  };
   const [searchParams, setSearchParams] = useSearchParams();
+  const dispatch = useDispatch();
 
   const column = useMemo(() => calculateColumn(props.containerStyle.width), [props.containerStyle.width]);
 
@@ -37,9 +37,24 @@ export default (props: Props) => {
     return props.containerStyle.width / (column * 2) - 50 + 'px';
   }, [props.containerStyle.width, column]);
 
-  const checkToObject = (type: string, id: number) => {
-    const queryParamsArray = Object.fromEntries(searchParams.entries());
-    console.log(type, id, queryParamsArray);
+  const { level, platform_id, platform_entity_id, admin_id } = useMemo(() => {
+    return Object.fromEntries(searchParams.entries());
+  }, [searchParams]);
+
+  const { data, error, loading } = useRequest(getRoleList, {
+    defaultParams: [{ platform_id: 2, query_all: 1 }],
+  });
+  const roleOptions = useMemo(() => {
+    if (loading) return [];
+    return onConvertCheckBox(data, { label: 'role_name', value: 'role_id' });
+  }, [loading]);
+
+  const checkToObject = (type: string, row: any) => {
+    const searchParamsObject = Object.fromEntries(searchParams.entries());
+    dispatch({
+      type: 'auth/setAuthLevel',
+      payload: { level, info: { name: row.realname, ...searchParamsObject } },
+    });
     /**
      * level 选择等级
      * platform_id 对应平台id
@@ -48,13 +63,25 @@ export default (props: Props) => {
      * type 对应当前应该查询的页面
      */
     setSearchParams({
-      level: '',
-      platform_id: '',
-      platform_entity_id: '',
-      admin_id: '',
-      type: '',
+      level: `${parseInt(level) + 1}`,
+      platform_id: `3`,
+      platform_entity_id: `${row?.id}`,
+      admin_id: admin_id,
+      type: type,
     });
   };
+  // const options = [
+  //   { label: 'Apple', value: 'Apple' },
+  //   { label: 'Pear', value: 'Pear' },
+  //   { label: 'Orange', value: 'Orange' },
+  //   { label: 'Apple', value: 'Apple' },
+  //   { label: 'Pear', value: 'Pear' },
+  //   { label: 'Orange', value: 'Orange' },
+  //   { label: 'Apple', value: 'Apple' },
+  //   { label: 'Pear', value: 'Pear' },
+  //   { label: 'Orange', value: 'Orange' },
+  // ];
+  function onChange() {}
 
   return (
     <ProList<GithubIssueItem>
@@ -63,10 +90,22 @@ export default (props: Props) => {
       rowKey="name"
       request={async (params) => {
         const { current, ...values } = params;
-        return await getCompanyListToTable({
-          ...values,
-          page: current,
-        });
+        switch (level) {
+          case '2':
+            return await getUserPlatformRelationsByUser({
+              ...values,
+              page: current,
+              id: platform_entity_id,
+              platform_id,
+            });
+          case '3':
+            break;
+          default:
+            return await getAdminList({
+              ...values,
+              page: current,
+            });
+        }
       }}
       pagination={{
         pageSize: 5,
@@ -80,8 +119,8 @@ export default (props: Props) => {
       grid={{ column }}
       metas={{
         title: {
-          dataIndex: 'company',
-          title: '公司名称',
+          dataIndex: 'realname',
+          title: '用户名称',
           render: (_) => (
             <Typography.Text style={{ width: calculateTitleWidth }} ellipsis={{ tooltip: _ }}>
               {_}
@@ -89,26 +128,24 @@ export default (props: Props) => {
           ),
         },
         avatar: {
-          dataIndex: 'logoBase64',
+          dataIndex: 'avatar_url',
           search: false,
           render: (logo) => <div style={{ paddingRight: '10px' }}>{logo}</div>,
         },
         content: {
-          dataIndex: 'address',
           search: false,
-          render: (address) => (
-            <Typography.Text type="secondary" ellipsis={{ tooltip: address }}>
-              {address}
-            </Typography.Text>
+          render: () => (
+            <div>
+              <Checkbox.Group options={roleOptions} onChange={onChange} />
+            </div>
           ),
         },
         subTitle: {
-          dataIndex: 'legalPerson',
-          title: '法人名称',
-          render: (_, row) => (
+          dataIndex: 'tel',
+          title: '用户手机号',
+          render: (_) => (
             <Space size={0}>
-              <Tag color="blue">{row.legalPerson}</Tag>
-              <Tag>{row.mobile}</Tag>
+              <Tag color="blue">{_}</Tag>
             </Space>
           ),
         },
@@ -117,16 +154,33 @@ export default (props: Props) => {
           render: (text, row) => {
             // console.log(row);
             return [
-              <a key="user" onClick={() => checkToObject('user', row.id)}>
-                授权用户
-              </a>,
-              <a key="project" onClick={() => checkToObject('project', row.id)}>
-                授权项目
-              </a>,
+              level === '1' ? (
+                <a key="company" onClick={() => checkToObject('company', row)}>
+                  授权公司
+                </a>
+              ) : (
+                <a key="project" onClick={() => checkToObject('project', row)}>
+                  授权项目
+                </a>
+              ),
             ];
           },
           search: false,
         },
+      }}
+      toolBarRender={() => {
+        return [
+          level === '2' && (
+            <AuthDrawerTable
+              trigger={
+                <Button key="3" type="primary">
+                  绑定/解绑 用户
+                </Button>
+              }
+              title={'绑定用户'}
+            ></AuthDrawerTable>
+          ),
+        ];
       }}
     />
   );

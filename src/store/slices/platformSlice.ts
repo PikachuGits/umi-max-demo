@@ -14,9 +14,9 @@ export const platformSlice = createSlice({
     [PlatformEnum.PROJECT]: '',
   },
   reducers: {
-    // getUserInfo: (state) => {
-    //   state.user_info = localStorageGet(CacheEnum.USER_INFO);
-    // },
+    getDemo: (state) => {
+      console.log(state);
+    },
     // setUserInfo: (state, { payload }: { payload: User.UserInfo }) => {
     //   localStorageSet(CacheEnum.USER_INFO, payload);
     //   localStorageSet(CacheEnum.TOKEN, payload.token);
