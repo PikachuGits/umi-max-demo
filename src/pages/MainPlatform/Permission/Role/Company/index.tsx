@@ -1,14 +1,16 @@
 import { CustomPageContainer, ProEditable } from '@/components';
-import { GroupFormDrawer } from '@/pages/MainPlatform/User/Group/component';
-import { defaultColumns } from '@/pages/MainPlatform/User/Group/config/table-columns';
-import { delAdminGroup, getAdminGroupList } from '@/services/user/UserController';
+import { RoleFormDrawer } from '@/pages/MainPlatform/Permission/Role/Company/component';
+import { defaultColumns } from '@/pages/MainPlatform/Permission/Role/Company/config/table-columns';
+import { delRole, getRoleList } from '@/services/role/RoleController';
+import { isEmpty } from '@/utils/format';
+import { useSearchParams } from '@@/exports';
 import { DeleteOutlined, FormOutlined, PlusOutlined } from '@ant-design/icons';
-import { ActionType } from '@ant-design/pro-components';
 import { Button } from 'antd';
 import { useEffect, useRef } from 'react';
 
 export default () => {
-  const actionRef = useRef<ActionType>();
+  const actionRef = useRef<any>();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   async function handleSave(value: Company, record: Company) {
     // await editCompanyInfo({ ...value, id: record.id });
@@ -19,12 +21,12 @@ export default () => {
     defaultColumns.find((item) => {
       if (item.dataIndex == 'action') {
         item.render = (event: any) => {
-          console.log('event', '11111');
+          // console.log('event', event.props);
           // text: string, record: object, _, action
           return (
             <div style={{ display: 'flex' }}>
               <a style={{ padding: '5px' }} key="editable">
-                <GroupFormDrawer
+                <RoleFormDrawer
                   onChange={() => {
                     actionRef.current?.reload();
                   }}
@@ -36,8 +38,12 @@ export default () => {
                 style={{ padding: '5px' }}
                 key="delete"
                 onClick={() => {
-                  console.log('event', event.props.record.id);
-                  delAdminGroup({});
+                  delRole({
+                    role_id: event.props.record.role_id,
+                    platform_id: '2',
+                  }).then(() => {
+                    actionRef.current?.reload();
+                  });
                 }}
               >
                 <DeleteOutlined style={{ color: 'red' }} />
@@ -45,8 +51,6 @@ export default () => {
             </div>
           );
         };
-      } else {
-        console.log('event', '22222');
       }
     });
   }, []);
@@ -54,20 +58,33 @@ export default () => {
   return (
     <CustomPageContainer>
       <ProEditable
-        handleSave={handleSave}
         defaultColumns={defaultColumns}
         actionRef={actionRef}
         cardBordered
         scroll={{ x: '100%' }}
+        onDataSourceChange={(dataSource) => {
+          console.log('dataSource', dataSource);
+          const { current, pageSize } = actionRef.current.pageInfo;
+
+          if (parseInt(current) > 1 && isEmpty(dataSource)) {
+            console.log('dataSource', { current: `${parseInt(current) - 1}`, pageSize });
+            actionRef.current?.setPageInfo({
+              ...actionRef.current.pageInfo,
+              current: `${parseInt(current) - 1}`,
+            });
+            actionRef.current?.reload();
+          }
+        }}
         request={async (params, sort, filter) => {
-          console.log(sort, filter);
+          // console.log(sort, filter);
           const { current, ...values } = params;
-          return await getAdminGroupList({
+          return await getRoleList({
             ...values,
             page: current,
+            platform_id: '2',
           });
         }}
-        rowKey="id"
+        rowKey="role_id"
         options={{
           setting: {
             listsHeight: 400,
@@ -84,35 +101,22 @@ export default () => {
           },
         }}
         pagination={{
-          pageSize: 10,
-          // onChange: (page) => console.log('page', page),
+          pageSize: 1,
+          onChange: (page) => {},
         }}
         toolBarRender={() => [
-          <GroupFormDrawer
+          <RoleFormDrawer
             onChanfe={() => {
               actionRef.current?.reload();
             }}
             trigger={
               <Button type="primary">
                 <PlusOutlined />
-                添加用户组
+                添加角色
               </Button>
             }
           />,
         ]}
-        // additionalButtons={[
-        //   <GroupFormDrawer
-        //     onChange={() => {
-        //       actionRef.current?.reload();
-        //     }}
-        //     trigger={
-        //       <Button type="primary">
-        //         <PlusOutlined />
-        //         添加用户组
-        //       </Button>
-        //     }
-        //   />,
-        // ]}
       />
     </CustomPageContainer>
   );
