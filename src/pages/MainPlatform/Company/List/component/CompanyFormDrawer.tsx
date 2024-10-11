@@ -35,7 +35,7 @@ export default (props: any) => {
 
           message.success('提交成功');
           props.onChange();
-          return true;
+          // return true;
         }}
         initialValues={initialValues}
       >
@@ -104,7 +104,7 @@ export default (props: any) => {
           <ProFormText
             width="md"
             name="code"
-            label="企业简称"
+            label="英文简称"
             placeholder="用于生成本公司项目编号只允许包含大写字母和数字"
             rules={[
               {
@@ -149,27 +149,9 @@ export default (props: any) => {
               },
             ]}
           />
-          <ProFormText
-            width="md"
-            name="sort"
-            label="云盘排序"
-            placeholder="请输入"
-            rules={[
-              {
-                required: true,
-                message: '请输入云盘排序',
-              },
-            ]}
-          />
           <ProFormUploadButton
             name="logoBase64"
             label="上传logo"
-            rules={[
-              {
-                required: true,
-                message: '请上传logo',
-              },
-            ]}
             max={1}
             fieldProps={{
               name: 'file',
