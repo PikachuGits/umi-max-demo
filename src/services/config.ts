@@ -1,5 +1,6 @@
 import companyApi from '@/services/company/api';
 import roleApi from '@/services/role/api';
+import systemApi from '@/services/system/api';
 import userApi from '@/services/user/api';
 const proxy = process.env.API_PROXY || '/api'; // api
 
@@ -10,6 +11,7 @@ const endpoints = {
   ...companyApi,
   ...userApi,
   ...roleApi,
+  ...systemApi,
 };
 
 export const API = Object.fromEntries(Object.entries(endpoints).map(([key, endpoint]) => [key, `${proxy}${endpoint}`]));

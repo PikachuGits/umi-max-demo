@@ -1,7 +1,7 @@
 import { CustomPageContainer, ProEditable } from '@/components';
-import { CompanyFormDrawer } from '@/pages/MainPlatform/Company/List/component';
-import { defaultColumns } from '@/pages/MainPlatform/Company/List/config/table-columns';
-import { editCompanyInfo, getCompanyListToTable } from '@/services/company/CompanyController';
+import { SystemFormDrawer } from '@/pages/MainPlatform/System/Configuration/component';
+import { defaultColumns } from '@/pages/MainPlatform/System/Configuration/config/table-columns';
+import { delConfig, getConfigList } from '@/services/system/SystemController';
 import { DeleteOutlined, FormOutlined, PlusOutlined } from '@ant-design/icons';
 import { ActionType } from '@ant-design/pro-components';
 import { Button } from 'antd';
@@ -11,8 +11,8 @@ export default () => {
   const actionRef = useRef<ActionType>();
 
   async function handleSave(value: Company, record: Company) {
-    await editCompanyInfo({ ...value, id: record.id });
-    actionRef.current?.reload();
+    // await editCompanyInfo({ ...value, id: record.id });
+    // actionRef.current?.reload();
   }
   useEffect(() => {
     defaultColumns.find((item) => {
@@ -23,7 +23,7 @@ export default () => {
           return (
             <div style={{ display: 'flex' }}>
               <a style={{ padding: '5px' }} key="editable">
-                <CompanyFormDrawer
+                <SystemFormDrawer
                   onChange={() => {
                     actionRef.current?.reload();
                   }}
@@ -31,7 +31,16 @@ export default () => {
                   initialValues={event.props.record}
                 />
               </a>
-              <a style={{ padding: '5px' }} key="delete" onClick={() => {}}>
+              <a
+                style={{ padding: '5px' }}
+                key="delete"
+                onClick={() => {
+                  console.log('event', event.props);
+                  delConfig(event.props.record).then(() => {
+                    actionRef.current?.reload();
+                  });
+                }}
+              >
                 <DeleteOutlined style={{ color: 'red' }} />
               </a>
             </div>
@@ -52,12 +61,12 @@ export default () => {
         request={async (params, sort, filter) => {
           // console.log(sort, filter);
           const { current, ...values } = params;
-          return await getCompanyListToTable({
+          return await getConfigList({
             ...values,
             page: current,
           });
         }}
-        rowKey="id"
+        rowKey="config_id"
         options={{
           setting: {
             listsHeight: 400,
@@ -77,15 +86,15 @@ export default () => {
           pageSize: 10,
           // onChange: (page) => console.log('page', page),
         }}
-        additionalButtons={[
-          <CompanyFormDrawer
-            onChange={() => {
+        toolBarRender={() => [
+          <SystemFormDrawer
+            onChanfe={() => {
               actionRef.current?.reload();
             }}
             trigger={
               <Button type="primary">
                 <PlusOutlined />
-                创建公司
+                添加配置
               </Button>
             }
           />,
