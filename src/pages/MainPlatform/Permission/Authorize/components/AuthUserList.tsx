@@ -1,15 +1,16 @@
+import Loading from '@/components/Loading/loading';
 import { GithubIssueItem } from '@/pages/MainPlatform/Company/List/typings';
 import { AuthDrawerTable } from '@/pages/MainPlatform/Permission/Authorize/components/index';
 import { calculateColumn } from '@/pages/MainPlatform/Permission/Authorize/config';
-import { userColumns } from '@/pages/MainPlatform/Permission/Authorize/config/auth-user-columns';
-import { getRoleList, getUserPlatformRelationsByUser } from '@/services/auth/AuthController';
+import { userColumns } from '@/pages/MainPlatform/Permission/Authorize/config/auth-drawer-table-columns';
+import { getRoleList, getUserPlatformRelationsByUser, setRelations } from '@/services/auth/AuthController';
 import { getAdminList } from '@/services/user/UserController';
 import { onConvertCheckBox } from '@/utils/format';
 import { ProList } from '@ant-design/pro-components';
 import { useSearchParams } from '@umijs/max';
 import { useRequest } from 'ahooks';
-import { Button, Checkbox, Space, Tag, Typography } from 'antd';
-import { useMemo } from 'react';
+import { Button, Checkbox, message, Space, Tag, Typography } from 'antd';
+import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 interface Props {
   containerStyle: {
@@ -31,6 +32,8 @@ interface Props {
 export default (props: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
+  // 记录绑定关系是否成功
+  const [relationType, setRelationType] = useState(false);
 
   const column = useMemo(() => calculateColumn(props.containerStyle.width), [props.containerStyle.width]);
 
@@ -38,60 +41,74 @@ export default (props: Props) => {
     return props.containerStyle.width / (column * 2) - 50 + 'px';
   }, [props.containerStyle.width, column]);
 
-  const { level, platform_id, platform_entity_id, admin_id } = useMemo(() => {
+  const { level, platform_id, platform_entity_id, type } = useMemo(() => {
     return Object.fromEntries(searchParams.entries());
   }, [searchParams]);
 
-  const { data: adminIds, loading: loadingToIds } = useRequest(getUserPlatformRelationsByUser, {
+  /**
+   * 获取和平台实体有绑定关系的用户id列表
+   * 不分页
+   */
+  const adminIds = useRequest(getUserPlatformRelationsByUser, {
     defaultParams: [{ platform_id: platform_id, query_all: 1, id: platform_entity_id }],
   });
+  // 将用户id列表放入到selectedRowKeys传给DrawerTable默认选中项
   const selectedRowKeys = useMemo(() => {
-    if (loadingToIds) return [];
-    console.log(adminIds);
-    return adminIds;
-  }, [loadingToIds]);
+    if (adminIds.loading) return [];
+    return adminIds.data;
+  }, [adminIds.loading]);
 
-  const { data, loading } = useRequest(getRoleList, {
-    defaultParams: [{ platform_id: 2, query_all: 1 }],
+  /**
+   * 获取角色列表
+   * 不分页
+   */
+  const roleList = useRequest(getRoleList, {
+    defaultParams: [{ platform_id: platform_id, query_all: 1 }],
   });
 
+  // 整形角色列表转为 {label,value} 形式
   const roleOptions = useMemo(() => {
-    if (loading) return [];
-    return onConvertCheckBox(data, { label: 'role_name', value: 'role_id' });
-  }, [loading]);
+    if (roleList.loading) return [];
+    return onConvertCheckBox(roleList.data, { label: 'role_name', value: 'role_id' });
+  }, [roleList.loading]);
 
+  const setRelationsApi = useRequest(setRelations, {
+    manual: true,
+    onSuccess: (data) => {
+      if (data) {
+        setRelationType(true);
+      } else {
+        message.error('服务器返回结果为false');
+      }
+    },
+  });
+
+  /**
+   * 选择切换页面
+   * level 选择等级 platform_id 对应平台id platform_entity_id 对应平台实体id admin_id 用户id type 对应当前应该查询的页面
+   * platform_id 举例:
+   *      如果上一级是公司, 则对应要查询的platform_id是公司平台的id, 等于2;
+   *      如果上一级是项目, 则对应要查询的platform_id是项目平台的id, 等于3;
+   *      ( 这里的平台id只的是类型, 1 总平台 2 公司平台 3 项目平台 )
+   * @param type
+   * @param row
+   */
   const checkToObject = (type: string, row: any) => {
     const searchParamsObject = Object.fromEntries(searchParams.entries());
     dispatch({
       type: 'auth/setAuthLevel',
       payload: { level, info: { name: row.realname, ...searchParamsObject } },
     });
-    /**
-     * level 选择等级
-     * platform_id 对应平台id
-     * platform_entity_id 对应平台实体id
-     * admin_id 用户id
-     * type 对应当前应该查询的页面
-     */
+
     setSearchParams({
       level: `${parseInt(level) + 1}`,
-      platform_id: `3`,
-      platform_entity_id: `${row?.id}`,
-      admin_id: admin_id,
+      platform_id: `${parseInt(level) + 1}`,
+      platform_entity_id,
+      admin_id: row.admin_id,
       type: type,
     });
   };
-  // const options = [
-  //   { label: 'Apple', value: 'Apple' },
-  //   { label: 'Pear', value: 'Pear' },
-  //   { label: 'Orange', value: 'Orange' },
-  //   { label: 'Apple', value: 'Apple' },
-  //   { label: 'Pear', value: 'Pear' },
-  //   { label: 'Orange', value: 'Orange' },
-  //   { label: 'Apple', value: 'Apple' },
-  //   { label: 'Pear', value: 'Pear' },
-  //   { label: 'Orange', value: 'Orange' },
-  // ];
+
   function onChange() {}
 
   return (
@@ -103,14 +120,13 @@ export default (props: Props) => {
         const { current, ...values } = params;
         switch (level) {
           case '2':
+          case '3':
             return await getUserPlatformRelationsByUser({
               ...values,
               page: current,
               id: platform_entity_id,
               platform_id,
             });
-          case '3':
-            break;
           default:
             return await getAdminList({
               ...values,
@@ -145,11 +161,12 @@ export default (props: Props) => {
         },
         content: {
           search: false,
-          render: () => (
-            <div>
+          render: () =>
+            roleList.loading ? (
+              <Loading tips={'正在加载角色'} />
+            ) : (
               <Checkbox.Group options={roleOptions} onChange={onChange} />
-            </div>
-          ),
+            ),
         },
         subTitle: {
           dataIndex: 'tel',
@@ -181,26 +198,43 @@ export default (props: Props) => {
       }}
       toolBarRender={(event, row) => {
         return [
-          level === '2' && (
-            <AuthDrawerTable
-              trigger={
-                <Button key="3" type="primary">
-                  绑定/解绑 用户
-                </Button>
-              }
-              title={'绑定用户'}
-              columns={userColumns}
-              rowKey={'admin_id'}
-              request={async (params: any) => {
-                const { current, ...values } = params;
-                return await getAdminList({
-                  ...values,
-                  page: current,
+          <AuthDrawerTable
+            key={type}
+            trigger={
+              <Button key="3" type="primary">
+                绑定/解绑 用户
+              </Button>
+            }
+            loading={setRelationsApi.loading}
+            title={'绑定用户'}
+            columns={userColumns}
+            onSubmit={(params: any) => {
+              const data: {
+                admin_id: number;
+                platform_id: number;
+                platform_entity_id: number;
+              }[] = [];
+              params.forEach((admin_id: number) => {
+                data.push({
+                  admin_id,
+                  platform_id: parseInt(platform_id),
+                  platform_entity_id: parseInt(platform_entity_id),
                 });
-              }}
-              selectedRowKeys={selectedRowKeys}
-            ></AuthDrawerTable>
-          ),
+              });
+              setRelationsApi.run({ relations: data });
+              // 提交方法
+              return relationType;
+            }}
+            rowKey={'admin_id'}
+            request={async (params: any) => {
+              const { current, ...values } = params;
+              return await getAdminList({
+                ...values,
+                page: current,
+              });
+            }}
+            selectedRowKeys={selectedRowKeys}
+          />,
         ];
       }}
     />

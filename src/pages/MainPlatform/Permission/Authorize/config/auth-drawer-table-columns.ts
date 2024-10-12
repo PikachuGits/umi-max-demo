@@ -15,3 +15,18 @@ export const userColumns: ProColumns<GithubIssueItem>[] = [
     // tooltip: '标题过长会自动收缩',
   },
 ];
+
+export const projectColumns: ProColumns<GithubIssueItem>[] = [
+  {
+    title: '项目名称',
+    dataIndex: 'project_name',
+    ellipsis: true,
+    // tooltip: '标题过长会自动收缩',
+  },
+  {
+    title: '项目合同编号',
+    dataIndex: 'current_company_no',
+    ellipsis: true,
+    // tooltip: '标题过长会自动收缩',
+  },
+];

@@ -6,16 +6,16 @@ import React, { cloneElement, useState } from 'react';
 
 export default (props: any) => {
   const { children, showDrawer } = props;
+
   const [open, setOpen] = useState(false);
 
   const onClose = () => {
     setOpen(false);
   };
-
   return (
     <React.Suspense fallback={'loading'}>
       {cloneElement(children, { onClick: () => setOpen(true) })}
-      <Drawer title="快速进入公司入口" width={550} closable={false} placement="left" onClose={onClose} open={open}>
+      <Drawer title="快速进入项目入口" width={550} closable={false} placement="left" onClose={onClose} open={open}>
         <ProList<GithubIssueItem>
           search={{}}
           rowKey="name"

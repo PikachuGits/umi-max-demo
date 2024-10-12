@@ -1,13 +1,21 @@
 import { CustomPageContainer } from '@/components';
 import { AuthorizeEnum } from '@/settings/enum';
 import store from '@/store';
+import { classes_module } from '@/utils/class-module';
 import { isEmpty } from '@/utils/format';
 import { useSearchParams } from '@@/exports';
+import { BankOutlined, ProductOutlined, UsergroupAddOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { AuthCompanyList, AuthProjectList, AuthUserList } from './components';
-import './index.less';
+import styles from './index.less';
+
+const iconTypes = new Map([
+  ['company', <BankOutlined key={'company'} />],
+  ['user', <UsergroupAddOutlined key={'user'} />],
+  ['project', <ProductOutlined key={'project'} />],
+]);
 
 const AfterChildrenExample: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,11 +23,11 @@ const AfterChildrenExample: React.FC = () => {
   const dispatch = useDispatch();
   function onCleanState() {
     setSearchParams({});
-    dispatch({ type: 'auth/cleanState' });
+    dispatch({ type: 'auth/cleanState' }); // 清除授权缓存层级和详情信息
   }
   useEffect(() => {
     return () => {
-      onCleanState();
+      dispatch({ type: 'auth/cleanState' }); // 清除授权缓存层级和详情信息
     };
   }, []);
 
@@ -43,7 +51,6 @@ const AfterChildrenExample: React.FC = () => {
       onCleanState();
     }
     setType(type);
-    console.log(level, type);
   }, [searchParams]);
 
   const containerRef = useRef<any>(null); // 内部使用的 ref
@@ -76,12 +83,13 @@ const AfterChildrenExample: React.FC = () => {
           !isEmpty(item) && (
             <Button
               key={key}
-              type="dashed"
+              ghost={true}
+              type="primary"
               style={{ padding: '6px 10px', margin: '0 10px 10px 10px' }}
-              // icon={<CloseOutlined  />}
               onClick={() => onCloseButton(item)}
-              iconPosition={'end'}
+              icon={iconTypes.get(item.type)}
               size={'large'}
+              className={classes_module(styles, 'auth-top-button')}
             >
               <span>{item.name}</span>
             </Button>

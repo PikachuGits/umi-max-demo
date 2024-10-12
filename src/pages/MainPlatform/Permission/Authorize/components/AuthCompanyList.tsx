@@ -50,7 +50,7 @@ export default (props: Props) => {
      */
     setSearchParams({
       level: `${parseInt(level) + 1}`,
-      platform_id: `2`,
+      platform_id: `${parseInt(level) + 1}`,
       platform_entity_id: `${row?.id}`,
       admin_id: '',
       type: type,

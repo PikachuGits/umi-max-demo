@@ -34,11 +34,13 @@ export default (props: any) => {
             className={classes_module(styles, 'headerRender-container-icon', 'headerRender-container-min-768')}
           />
           <Tooltip title="切换公司">
-            {/* 公司菜单 */}
-            <ProductOutlined
-              className={classes_module(styles, 'headerRender-container-icon')}
-              onClick={() => setOpen(true)}
-            />
+            <CompanyListDrawer>
+              {/* 公司菜单 */}
+              <ProductOutlined
+                className={classes_module(styles, 'headerRender-container-icon')}
+                onClick={() => setOpen(true)}
+              />
+            </CompanyListDrawer>
           </Tooltip>
         </div>
         {/* logo + 标题 */}
@@ -64,7 +66,7 @@ export default (props: any) => {
           </div>
         </AvatarDropdown>
       </div>
-      <CompanyListDrawer open={open} setOpen={setOpen} />
+      {/*<CompanyListDrawer open={open} setOpen={setOpen} />*/}
     </div>
   );
 };

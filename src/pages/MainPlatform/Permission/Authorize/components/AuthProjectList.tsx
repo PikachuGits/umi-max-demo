@@ -1,8 +1,10 @@
 import { GithubIssueItem } from '@/pages/MainPlatform/Company/List/typings';
+import { AuthDrawerTable } from '@/pages/MainPlatform/Permission/Authorize/components/index';
 import { calculateColumn } from '@/pages/MainPlatform/Permission/Authorize/config';
-import { getRoleList, getUserPlatformRelationsByUser } from '@/services/auth/AuthController';
-import { getAdminList } from '@/services/user/UserController';
-import { onConvertCheckBox } from '@/utils/format';
+import { projectColumns } from '@/pages/MainPlatform/Permission/Authorize/config/auth-drawer-table-columns';
+import { getRoleList, getUserPlatformRelationsByPlatform } from '@/services/auth/AuthController';
+import { getProjectList } from '@/services/project/ProjectController';
+import { isEmpty, onConvertCheckBox } from '@/utils/format';
 import { ProList } from '@ant-design/pro-components';
 import { useSearchParams } from '@umijs/max';
 import { useRequest } from 'ahooks';
@@ -40,19 +42,39 @@ export default (props: Props) => {
     return Object.fromEntries(searchParams.entries());
   }, [searchParams]);
 
-  const { data, error, loading } = useRequest(getRoleList, {
-    defaultParams: [{ platform_id: 2, query_all: 1 }],
+  /**
+   * 获取角色列表
+   * 不分页
+   */
+  const roleList = useRequest(getRoleList, {
+    defaultParams: [{ platform_id: platform_id, query_all: 1 }],
   });
+
+  // 整形角色列表转为 {label,value} 形式
   const roleOptions = useMemo(() => {
-    if (loading) return [];
-    return onConvertCheckBox(data, { label: 'role_name', value: 'role_id' });
-  }, [loading]);
+    if (roleList.loading || level !== '3') return [];
+    return onConvertCheckBox(roleList.data, { label: 'role_name', value: 'role_id' });
+  }, [roleList.loading]);
+
+  /**
+   * 获取和平台实体有绑定关系的用户id列表
+   * 不分页
+   */
+  const projectIds = useRequest(getUserPlatformRelationsByPlatform, {
+    defaultParams: [{ platform_id: platform_id, query_all: 1, company_id: platform_entity_id }],
+  });
+
+  // 将用户id列表放入到selectedRowKeys传给DrawerTable默认选中项
+  const selectedRowKeys = useMemo(() => {
+    if (projectIds.loading || level !== '3') return [];
+    return projectIds.data;
+  }, [projectIds.loading]);
 
   const checkToObject = (type: string, row: any) => {
     const searchParamsObject = Object.fromEntries(searchParams.entries());
     dispatch({
       type: 'auth/setAuthLevel',
-      payload: { level, info: { name: row.realname, ...searchParamsObject } },
+      payload: { level, info: { name: row.project_name, ...searchParamsObject } },
     });
     /**
      * level 选择等级
@@ -63,46 +85,38 @@ export default (props: Props) => {
      */
     setSearchParams({
       level: `${parseInt(level) + 1}`,
-      platform_id: `3`,
+      platform_id: `${parseInt(level) + 1}`,
       platform_entity_id: `${row?.id}`,
       admin_id: admin_id,
       type: type,
     });
   };
-  // const options = [
-  //   { label: 'Apple', value: 'Apple' },
-  //   { label: 'Pear', value: 'Pear' },
-  //   { label: 'Orange', value: 'Orange' },
-  //   { label: 'Apple', value: 'Apple' },
-  //   { label: 'Pear', value: 'Pear' },
-  //   { label: 'Orange', value: 'Orange' },
-  //   { label: 'Apple', value: 'Apple' },
-  //   { label: 'Pear', value: 'Pear' },
-  //   { label: 'Orange', value: 'Orange' },
-  // ];
+
   function onChange() {}
 
   return (
     <ProList<GithubIssueItem>
-      search={{}}
-      headerTitle="用户授权列表"
+      search={{
+        labelWidth: 'auto',
+      }}
+      headerTitle="项目授权列表"
       rowKey="name"
       request={async (params) => {
         const { current, ...values } = params;
         switch (level) {
           case '2':
-            return await getUserPlatformRelationsByUser({
+            return await getProjectList({
               ...values,
               page: current,
-              id: platform_entity_id,
-              platform_id,
+              company_id: platform_entity_id,
+              is_company: 1,
             });
           case '3':
-            break;
-          default:
-            return await getAdminList({
+            return await getUserPlatformRelationsByPlatform({
               ...values,
               page: current,
+              company_id: platform_entity_id,
+              platform_id,
             });
         }
       }}
@@ -118,8 +132,8 @@ export default (props: Props) => {
       grid={{ column }}
       metas={{
         title: {
-          dataIndex: 'realname',
-          title: '用户名称',
+          dataIndex: 'project_name',
+          title: '项目名称',
           render: (_) => (
             <Typography.Text style={{ width: calculateTitleWidth }} ellipsis={{ tooltip: _ }}>
               {_}
@@ -133,15 +147,16 @@ export default (props: Props) => {
         },
         content: {
           search: false,
-          render: () => (
-            <div>
-              <Checkbox.Group options={roleOptions} onChange={onChange} />
-            </div>
-          ),
+          render: () =>
+            !isEmpty(roleOptions) && (
+              <div>
+                <Checkbox.Group options={roleOptions} onChange={onChange} />
+              </div>
+            ),
         },
         subTitle: {
-          dataIndex: 'tel',
-          title: '用户手机号',
+          dataIndex: 'current_company_no',
+          title: '项目合同编号',
           render: (_) => (
             <Space size={0}>
               <Tag color="blue">{_}</Tag>
@@ -165,10 +180,30 @@ export default (props: Props) => {
       }}
       toolBarRender={() => {
         return [
-          (level === '2' || level === '3') && (
-            <Button key="3" type="primary">
-              添加项目
-            </Button>
+          level === '3' && (
+            <AuthDrawerTable
+              trigger={
+                <Button key="3" type="primary">
+                  绑定/解绑 项目
+                </Button>
+              }
+              title={'绑定项目'}
+              columns={projectColumns}
+              rowKey={'id'}
+              onSubmit={(params: any) => {
+                // 提交方法
+              }}
+              request={async (params: any) => {
+                const { current, ...values } = params;
+                return await getProjectList({
+                  ...values,
+                  page: current,
+                  company_id: platform_entity_id,
+                  is_company: 1,
+                });
+              }}
+              selectedRowKeys={selectedRowKeys}
+            ></AuthDrawerTable>
           ),
         ];
       }}
