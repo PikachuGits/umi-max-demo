@@ -3,14 +3,16 @@ import { GithubIssueItem } from '@/pages/MainPlatform/Company/List/typings';
 import { AuthDrawerTable } from '@/pages/MainPlatform/Permission/Authorize/components/index';
 import { calculateColumn } from '@/pages/MainPlatform/Permission/Authorize/config';
 import { userColumns } from '@/pages/MainPlatform/Permission/Authorize/config/auth-drawer-table-columns';
-import { getRoleList, getUserPlatformRelationsByUser, setRelations } from '@/services/auth/AuthController';
+import { getRoleList } from '@/services/auth/AuthController';
 import { getAdminList } from '@/services/user/UserController';
-import { onConvertCheckBox } from '@/utils/format';
-import { ProList } from '@ant-design/pro-components';
+import { isEmpty, onConvertCheckBox } from '@/utils/format';
+import { useModel } from '@@/plugin-model';
+import { ActionType, ProList } from '@ant-design/pro-components';
 import { useSearchParams } from '@umijs/max';
 import { useRequest } from 'ahooks';
-import { Button, Checkbox, message, Space, Tag, Typography } from 'antd';
-import { useMemo, useState } from 'react';
+import { Button, Checkbox, Space, Tag, Typography } from 'antd';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
 import { useDispatch } from 'react-redux';
 interface Props {
   containerStyle: {
@@ -30,10 +32,20 @@ interface Props {
  */
 
 export default (props: Props) => {
+  /** 获取管理的api */
+  const {
+    setRelationsApi,
+    getRelationUserListReq,
+    getAdminListReq,
+    setRoleRelationsReq,
+    setRoleRelationAllReq,
+    getAdminIds,
+  } = useModel('authModel');
+
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
-  // 记录绑定关系是否成功
-  const [relationType, setRelationType] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const userListRef = useRef<ActionType>(null);
 
   const column = useMemo(() => calculateColumn(props.containerStyle.width), [props.containerStyle.width]);
 
@@ -45,43 +57,16 @@ export default (props: Props) => {
     return Object.fromEntries(searchParams.entries());
   }, [searchParams]);
 
-  /**
-   * 获取和平台实体有绑定关系的用户id列表
-   * 不分页
-   */
-  const adminIds = useRequest(getUserPlatformRelationsByUser, {
-    defaultParams: [{ platform_id: platform_id, query_all: 1, id: platform_entity_id }],
-  });
-  // 将用户id列表放入到selectedRowKeys传给DrawerTable默认选中项
-  const selectedRowKeys = useMemo(() => {
-    if (adminIds.loading) return [];
-    return adminIds.data;
-  }, [adminIds.loading]);
-
-  /**
-   * 获取角色列表
-   * 不分页
-   */
+  /** 获取角色列表 不分页 */
   const roleList = useRequest(getRoleList, {
     defaultParams: [{ platform_id: platform_id, query_all: 1 }],
   });
 
-  // 整形角色列表转为 {label,value} 形式
+  /** 整形角色列表转为 {label,value} 形式*/
   const roleOptions = useMemo(() => {
     if (roleList.loading) return [];
     return onConvertCheckBox(roleList.data, { label: 'role_name', value: 'role_id' });
   }, [roleList.loading]);
-
-  const setRelationsApi = useRequest(setRelations, {
-    manual: true,
-    onSuccess: (data) => {
-      if (data) {
-        setRelationType(true);
-      } else {
-        message.error('服务器返回结果为false');
-      }
-    },
-  });
 
   /**
    * 选择切换页面
@@ -109,26 +94,59 @@ export default (props: Props) => {
     });
   };
 
-  function onChange() {}
+  function onSetRoleId(roles: any[], row: any) {
+    const { relation_id } = row;
+    // 开启loading
+    setLoading(true);
+    setRoleRelationsReq.runAsync({ relation_id, roles }).then(() => {
+      userListRef.current?.reload();
+    });
+  }
+  function onSetRoleIdAll(row: any) {
+    const { relation_id } = row;
+    // 开启loading
+    setLoading(true);
+    setRoleRelationAllReq
+      .runAsync({ relation_id, platform_id: parseInt(platform_id), platform_entity_id: parseInt(platform_entity_id) })
+      .then(() => {
+        userListRef.current?.reload();
+      });
+  }
+
+  useEffect(() => {
+    switch (level) {
+      case '2':
+      case '3':
+        setLoading(getRelationUserListReq.loading);
+        return;
+      default:
+        setLoading(getAdminListReq.loading);
+        return;
+    }
+  }, [getAdminListReq.loading, getRelationUserListReq.loading]);
 
   return (
     <ProList<GithubIssueItem>
       search={{}}
       headerTitle="用户授权列表"
+      actionRef={userListRef}
+      loading={loading}
       rowKey="name"
       request={async (params) => {
+        // setLoading(true);
         const { current, ...values } = params;
+
         switch (level) {
           case '2':
           case '3':
-            return await getUserPlatformRelationsByUser({
+            return await getRelationUserListReq.runAsync({
               ...values,
               page: current,
               id: platform_entity_id,
               platform_id,
             });
           default:
-            return await getAdminList({
+            return await getAdminListReq.runAsync({
               ...values,
               page: current,
             });
@@ -161,21 +179,29 @@ export default (props: Props) => {
         },
         content: {
           search: false,
-          render: () =>
-            roleList.loading ? (
+          render: (_, row) => {
+            const { role_ids } = row;
+            const ids = isEmpty(role_ids) ? [] : role_ids.split(',').map(Number);
+            return roleList.loading ? (
               <Loading tips={'正在加载角色'} />
             ) : (
-              <Checkbox.Group options={roleOptions} onChange={onChange} />
-            ),
+              <Checkbox.Group value={ids} options={roleOptions} onChange={(e) => onSetRoleId(e, row)} />
+            );
+          },
         },
         subTitle: {
           dataIndex: 'tel',
           title: '用户手机号',
-          render: (_) => (
-            <Space size={0}>
-              <Tag color="blue">{_}</Tag>
-            </Space>
-          ),
+          render: (_, row) => {
+            return (
+              <Space size={0}>
+                <Tag color="blue">{_}</Tag>
+                <Button color="danger" variant="dashed" size="small" onClick={() => onSetRoleIdAll(row)}>
+                  同步角色
+                </Button>
+              </Space>
+            );
+          },
         },
         actions: {
           cardActionProps: 'actions',
@@ -196,34 +222,30 @@ export default (props: Props) => {
           search: false,
         },
       }}
-      toolBarRender={(event, row) => {
+      toolBarRender={() => {
         return [
           <AuthDrawerTable
             key={type}
             trigger={
-              <Button key="3" type="primary">
+              <Button loading={loading} key="3" type="primary">
                 绑定/解绑 用户
               </Button>
             }
-            loading={setRelationsApi.loading}
+            loading={setRelationsApi.loading || getAdminIds.loading}
             title={'绑定用户'}
             columns={userColumns}
-            onSubmit={(params: any) => {
-              const data: {
-                admin_id: number;
-                platform_id: number;
-                platform_entity_id: number;
-              }[] = [];
-              params.forEach((admin_id: number) => {
-                data.push({
-                  admin_id,
+            onSubmit={async (params: any) => {
+              const data = {
+                relations: {
                   platform_id: parseInt(platform_id),
                   platform_entity_id: parseInt(platform_entity_id),
-                });
-              });
-              setRelationsApi.run({ relations: data });
-              // 提交方法
-              return relationType;
+                },
+                ids: params,
+                type: 'user',
+              };
+
+              await setRelationsApi.runAsync(data);
+              userListRef.current?.reload();
             }}
             rowKey={'admin_id'}
             request={async (params: any) => {
@@ -233,7 +255,9 @@ export default (props: Props) => {
                 page: current,
               });
             }}
-            selectedRowKeys={selectedRowKeys}
+            onChangeOpen={async () => {
+              return await getAdminIds.runAsync({ platform_id: platform_id, query_all: 1, id: platform_entity_id });
+            }}
           />,
         ];
       }}

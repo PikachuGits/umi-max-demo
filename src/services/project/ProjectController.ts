@@ -6,7 +6,7 @@ import { request } from '@@/exports';
  * @param params
  * @param options
  */
-export async function getProjectList(
+export async function getProjectListWithCompany(
   params: {
     /** current */
     page?: number;

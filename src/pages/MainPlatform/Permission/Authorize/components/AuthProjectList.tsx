@@ -1,15 +1,16 @@
+import Loading from '@/components/Loading/loading';
 import { GithubIssueItem } from '@/pages/MainPlatform/Company/List/typings';
 import { AuthDrawerTable } from '@/pages/MainPlatform/Permission/Authorize/components/index';
 import { calculateColumn } from '@/pages/MainPlatform/Permission/Authorize/config';
 import { projectColumns } from '@/pages/MainPlatform/Permission/Authorize/config/auth-drawer-table-columns';
 import { getRoleList, getUserPlatformRelationsByPlatform } from '@/services/auth/AuthController';
-import { getProjectList } from '@/services/project/ProjectController';
 import { isEmpty, onConvertCheckBox } from '@/utils/format';
-import { ProList } from '@ant-design/pro-components';
+import { useModel } from '@@/plugin-model';
+import { ActionType, ProList } from '@ant-design/pro-components';
 import { useSearchParams } from '@umijs/max';
 import { useRequest } from 'ahooks';
 import { Button, Checkbox, Space, Tag, Typography } from 'antd';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 interface Props {
   containerStyle: {
@@ -29,23 +30,38 @@ interface Props {
  */
 
 export default (props: Props) => {
+  /** 获取管理的api */
+  const {
+    setRelationsApi,
+    getRelationUserListReq,
+    getAdminListReq,
+    setRoleRelationsReq,
+    setRoleRelationAllReq,
+    getProjectListWithCompanyReq,
+    getUserPlatformRelationsByPlatformReq,
+    getAdminIds,
+  } = useModel('authModel');
+
+  const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
-
+  const projectListRef = useRef<ActionType>(null);
+  /**
+   * 自适应宽高问题
+   */
   const column = useMemo(() => calculateColumn(props.containerStyle.width), [props.containerStyle.width]);
 
   const calculateTitleWidth = useMemo(() => {
     return props.containerStyle.width / (column * 2) - 50 + 'px';
   }, [props.containerStyle.width, column]);
-
+  /**
+   * 获取路由信息
+   */
   const { level, platform_id, platform_entity_id, admin_id } = useMemo(() => {
     return Object.fromEntries(searchParams.entries());
   }, [searchParams]);
 
-  /**
-   * 获取角色列表
-   * 不分页
-   */
+  /** * 获取角色列表 不分页 */
   const roleList = useRequest(getRoleList, {
     defaultParams: [{ platform_id: platform_id, query_all: 1 }],
   });
@@ -56,19 +72,21 @@ export default (props: Props) => {
     return onConvertCheckBox(roleList.data, { label: 'role_name', value: 'role_id' });
   }, [roleList.loading]);
 
-  /**
-   * 获取和平台实体有绑定关系的用户id列表
-   * 不分页
-   */
-  const projectIds = useRequest(getUserPlatformRelationsByPlatform, {
-    defaultParams: [{ platform_id: platform_id, query_all: 1, company_id: platform_entity_id }],
+  /** 获取和平台实体有绑定关系的用户id列表 不分页 */
+  const getProjectIds = useRequest(getUserPlatformRelationsByPlatform, {
+    manual: true,
   });
 
-  // 将用户id列表放入到selectedRowKeys传给DrawerTable默认选中项
-  const selectedRowKeys = useMemo(() => {
-    if (projectIds.loading || level !== '3') return [];
-    return projectIds.data;
-  }, [projectIds.loading]);
+  useEffect(() => {
+    switch (level) {
+      case '2':
+        setLoading(getProjectListWithCompanyReq.loading);
+        return;
+      case '3':
+        setLoading(getUserPlatformRelationsByPlatformReq.loading);
+        return;
+    }
+  }, [getProjectListWithCompanyReq.loading, getUserPlatformRelationsByPlatformReq.loading]);
 
   const checkToObject = (type: string, row: any) => {
     const searchParamsObject = Object.fromEntries(searchParams.entries());
@@ -92,31 +110,52 @@ export default (props: Props) => {
     });
   };
 
-  function onChange() {}
+  function onSetRoleId(roles: any[], row: any) {
+    const { relation_id } = row;
+    // 开启loading
+    setLoading(true);
+    setRoleRelationsReq.runAsync({ relation_id, roles }).then(() => {
+      projectListRef.current?.reload();
+    });
+  }
+
+  function onSetRoleIdAll(row: any) {
+    const { relation_id } = row;
+    // 开启loading
+    setLoading(true);
+    setRoleRelationAllReq
+      .runAsync({ relation_id, platform_id: parseInt(platform_id), admin_id: parseInt(admin_id) })
+      .then(() => {
+        projectListRef.current?.reload();
+      });
+  }
 
   return (
     <ProList<GithubIssueItem>
       search={{
         labelWidth: 'auto',
       }}
+      actionRef={projectListRef}
       headerTitle="项目授权列表"
+      loading={loading}
       rowKey="name"
       request={async (params) => {
         const { current, ...values } = params;
         switch (level) {
           case '2':
-            return await getProjectList({
+            return await getProjectListWithCompanyReq.runAsync({
               ...values,
               page: current,
               company_id: platform_entity_id,
               is_company: 1,
             });
           case '3':
-            return await getUserPlatformRelationsByPlatform({
+            return await getUserPlatformRelationsByPlatformReq.runAsync({
               ...values,
               page: current,
-              company_id: platform_entity_id,
+              admin_id,
               platform_id,
+              company_id: platform_entity_id,
             });
         }
       }}
@@ -147,19 +186,27 @@ export default (props: Props) => {
         },
         content: {
           search: false,
-          render: () =>
-            !isEmpty(roleOptions) && (
-              <div>
-                <Checkbox.Group options={roleOptions} onChange={onChange} />
-              </div>
-            ),
+          render: (_, row) => {
+            const { role_ids } = row;
+            const ids = isEmpty(role_ids) ? [] : role_ids.split(',').map(Number);
+            return roleList.loading ? (
+              <Loading tips={'正在加载角色'} />
+            ) : (
+              <Checkbox.Group value={ids} options={roleOptions} onChange={(e) => onSetRoleId(e, row)} />
+            );
+          },
         },
         subTitle: {
           dataIndex: 'current_company_no',
           title: '项目合同编号',
-          render: (_) => (
+          render: (_, row) => (
             <Space size={0}>
               <Tag color="blue">{_}</Tag>
+              {level === '3' && (
+                <Button color="danger" variant="dashed" size="small" onClick={() => onSetRoleIdAll(row)}>
+                  同步角色
+                </Button>
+              )}
             </Space>
           ),
         },
@@ -182,27 +229,49 @@ export default (props: Props) => {
         return [
           level === '3' && (
             <AuthDrawerTable
+              key={'project'}
               trigger={
-                <Button key="3" type="primary">
+                <Button loading={loading} key="3" type="primary">
                   绑定/解绑 项目
                 </Button>
               }
+              loading={setRelationsApi.loading || getProjectListWithCompanyReq.loading}
               title={'绑定项目'}
               columns={projectColumns}
               rowKey={'id'}
-              onSubmit={(params: any) => {
+              onSubmit={async (params: any) => {
                 // 提交方法
+                const data = {
+                  relations: {
+                    platform_id: parseInt(platform_id),
+                    admin_id: parseInt(admin_id),
+                  },
+                  ids: params,
+                  type: 'platform',
+                };
+                setLoading(true);
+                setRelationsApi.runAsync(data).then(() => {
+                  projectListRef.current?.reload();
+                });
               }}
               request={async (params: any) => {
                 const { current, ...values } = params;
-                return await getProjectList({
+                return await getProjectListWithCompanyReq.runAsync({
                   ...values,
                   page: current,
                   company_id: platform_entity_id,
                   is_company: 1,
                 });
               }}
-              selectedRowKeys={selectedRowKeys}
+              onChangeOpen={async () => {
+                const data = {
+                  platform_id: platform_id,
+                  query_all: 1,
+                  admin_id,
+                  company_id: platform_entity_id,
+                };
+                return await getProjectIds.runAsync(data);
+              }}
             ></AuthDrawerTable>
           ),
         ];

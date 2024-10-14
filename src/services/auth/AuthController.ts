@@ -68,14 +68,6 @@ export async function getRoleList(
   },
   options?: { [key: string]: any },
 ) {
-  // // 延时函数，返回一个 Promise，在指定时间后 resolve
-  // const delay = (ms: number) =>
-  //   new Promise((resolve) => {
-  //     setTimeout(() => resolve(true), ms);
-  //   });
-  //
-  // // 模拟延时，比如延时 2 秒（2000 毫秒）
-  // await delay(10000);
   // 执行实际的 API 请求
   return request(API.getRoleList, {
     method: 'GET',
@@ -95,15 +87,63 @@ export async function getRoleList(
 export async function setRelations(
   data: {
     relations: {
-      admin_id: number;
-      platform_id: number;
-      platform_entity_id: number;
-    }[];
+      admin_id?: number;
+      platform_id?: number;
+      platform_entity_id?: number;
+    };
+    ids: number[];
+    type: string;
   },
   options?: { [key: string]: any },
 ) {
   // 执行实际的 API 请求
   return request(API.setRelations, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data,
+    ...(options || {}),
+  });
+}
+/**
+ * 将绑定关系与角色关联 (用户与 [公司/项目]的绑定关系)
+ * @param data
+ * @param options
+ */
+export async function setRoleRelations(
+  data: {
+    relation_id: number;
+    roles: number[];
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.setRoleRelations, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data,
+    ...(options || {}),
+  });
+}
+/**
+ * 批量 将绑定关系与角色关联 (用户与 [公司/项目]的绑定关系)
+ * @param data
+ * @param options
+ */
+export async function setRoleRelationAll(
+  data: {
+    admin_id?: number;
+    platform_id?: number;
+    platform_entity_id?: number;
+    relation_id: number;
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.setRoleRelationAll, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

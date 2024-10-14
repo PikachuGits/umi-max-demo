@@ -15,17 +15,22 @@ export default (props: any) => {
     onChange: onSelectChange,
   };
 
+  // useEffect(() => {
+  //   console.log(props.selectedRowKeys);
+  // }, [props]);
+
   /**
    * 提交表单
    */
-  function onSubmit() {
-    const res = props.onSubmit(selectedRowKeys);
-    if (!isEmpty(drawerRef.current) && res) drawerRef.current.onClose();
+  async function onSubmit() {
+    await props.onSubmit(selectedRowKeys);
+    if (!isEmpty(drawerRef.current)) drawerRef.current.onClose();
   }
 
   return (
     <DrawerTable
       ref={drawerRef}
+      loading={props.loading}
       trigger={props.trigger}
       drawerProps={{
         placement: 'right',
@@ -54,7 +59,7 @@ export default (props: any) => {
           if (type === 'get') {
             return {
               ...values,
-              created_at: [values.startTime, values.endTime],
+              // created_at: [values.startTime, values.endTime],
             };
           }
           return values;
@@ -64,7 +69,10 @@ export default (props: any) => {
         pageSize: 10,
         // onChange: (page) => console.log('page', page),
       }}
-      onOpenChange={() => setSelectedRowKeys(props.selectedRowKeys)}
+      onOpenChange={async () => {
+        const keys = await props.onChangeOpen();
+        setSelectedRowKeys(keys);
+      }}
       dateFormatter="string"
       toolBarRender={() => []}
     />
