@@ -187,11 +187,11 @@ export async function editAdminGroup(
 }
 /**
  * 删除用户组
- * @param params
+ * @param data
  * @param options
  */
 export async function delAdminGroup(
-  params: {
+  data: {
     page?: number;
     pageSize?: number;
     current?: number;
@@ -202,11 +202,11 @@ export async function delAdminGroup(
 ) {
   // 执行实际的 API 请求
   return request(API.delAdminGroup, {
-    method: 'GET',
+    method: 'post',
     headers: {
       'Content-Type': 'application/json',
     },
-    params,
+    data,
     ...(options || {}),
   });
 }
