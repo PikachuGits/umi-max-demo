@@ -1,73 +1,18 @@
-//.example {
-//  //border:1p;
-//
-//  margin: auto;
-//  font-size: 26px;
-//}
-//
-//
-//
-//
-//
-//.parent {
-//	background: white;
-//	width: 100px;
-//	height: 100px;
-//	display: flex;
-//	justify-content: center;
-//	align-items: center;
-//}
-//
-//.parent[data-isopen="true"] {
-//	width: 400px;
-//	height: 200px;
-//}
-//
-//.child {
-//	width: 40px;
-//	height: 40px;
-//	background: #f107a3;
-//	border-radius: 50%;
-//}
-
-.container {
-	display: flex;
-	justify-content: space-around;
-	position:relative;
-	width: 100%;
-	height: 100%;
+.auth-top-button:hover {
+  background: transparent !important;
+  color: transparent !important;
+  overflow: hidden;
+  border: 0 !important;
 }
-
-.card {
-	width: 150px;
-	height: 150px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background-color: #ccc;
-	cursor: pointer;
-	//transition: transform 0.6s ease-in-out,width 1s ease-in-out;
-	//transition:transform 1s ease;
-}
-
-.card.open {
-	//transform: scale(1.5); /* 点击时放大效果 */
-	position:absolute;
-	top:0;
-	left:0;
-	z-index:999;
-	width: 100%;
-	height: 100%;
-}
-
-h3 {
-	color: white;
-	font-size: 24px;
-}
-
-.overlay{
-	position:absolute;
-	background:#82f279;
-	top:0;
-	left:0;
+.auth-top-button:hover::after {
+  display: inline-flex;
+  content: '重新选择';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
 }

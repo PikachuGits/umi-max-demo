@@ -34,6 +34,7 @@ export function isEmpty(
 
 export function onConvertCheckBox(data: any[], { label, value }: { label: string; value: string }) {
   if (isEmpty(data)) return;
+
   return data.reduce((arr, obj) => {
     arr.push({ label: obj[label], value: obj[value] });
     return arr;

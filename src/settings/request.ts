@@ -1,5 +1,6 @@
 // 错误处理方案： 错误类型
 import store from '@/store';
+import { handleLogout } from '@/store/actions';
 import { AxiosResponse, RequestConfig } from '@@/plugin-request/request';
 import { message, notification } from 'antd';
 
@@ -33,7 +34,6 @@ export const RequestSetting: RequestConfig = {
   timeout: 10000,
   headers: { 'X-Requested-With': 'XMLHttpRequest' },
 
-  // 错误处理： umi@3 的错误处理方案。
   errorConfig: {
     // 错误抛出
     errorThrower: (res: ResponseStructure) => {
@@ -48,6 +48,7 @@ export const RequestSetting: RequestConfig = {
     // 错误接收及处理
     errorHandler: (error: any, opts: any) => {
       if (opts?.skipErrorHandler) throw error;
+
       // 我们的 errorThrower 抛出的错误。
       if (error.name === 'BizError') {
         const errorInfo: ResponseStructure | undefined = error.info;
@@ -84,10 +85,11 @@ export const RequestSetting: RequestConfig = {
         // 请求已经成功发起，但没有收到响应
         // \`error.request\` 在浏览器中是 XMLHttpRequest 的实例，
         // 而在node.js中是 http.ClientRequest 的实例
-        message.error('None response! Please retry.').then((r) => r);
+        message.error('请求已经成功发起，但没有收到响应').then((r) => r);
       } else {
         // 发送请求时出了点问题
-        message.error('Request error, please retry.').then((r) => r);
+        // message.error('发送请求时出了点问题').then((r) => r);
+        message.error(error).then((r) => r);
       }
     },
   },
@@ -108,8 +110,12 @@ export const RequestSetting: RequestConfig = {
       // 拦截响应数据，进行个性化处理
       const { data } = response;
       if (data.code !== 10000) {
-        // message.error(data.message).then((r) => r);
+        throw data.message;
         // store.dispatch(handleLogout());
+      }
+      if (data.code === 43002) {
+        message.error(data.message).then((r) => r);
+        store.dispatch(handleLogout());
       }
       return data;
     },
