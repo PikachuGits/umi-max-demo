@@ -14,5 +14,5 @@ max g page MainPlatform/System/Dictionary/index --typescript --less
 max g page MainPlatform/Permission/Role/index --typescript --less
 max g page MainPlatform/Permission/Authorize/index --typescript --less
 max g page About/index --typescript --less
-2
+
 

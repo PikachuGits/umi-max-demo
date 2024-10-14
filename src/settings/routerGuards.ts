@@ -1,6 +1,5 @@
 import store from '@/store';
 import { isEmpty } from '@/utils/format';
-import { history } from '@umijs/max';
 
 interface Route {
   path: string;
@@ -56,13 +55,13 @@ export const RouterGuards = ({ location, clientRoutes, routes, isFirst }: Router
     return;
   }
 
-  // 页面首次加载，且当前路径不存在时，跳转到默认路径
-  if ((!findPath(clientRoutes, location.pathname) || location.pathname === '/') && isFirst) {
-    const layoutRoute = clientRoutes.find((item) => item.id === 'ant-design-pro-layout');
-
-    if (layoutRoute && layoutRoute.children && layoutRoute.children.length > 0) {
-      // 跳转到 layout 的第一个子路由
-      history.push(layoutRoute.children[0].path);
-    }
-  }
+  // 页面首次加载，且当前路径不存在时，跳转到默认路径 Todo 加载问题,会导致阿跳转到undefined 暂时注释
+  // if ((!findPath(clientRoutes, location.pathname) || location.pathname === '/') && isFirst) {
+  //   const layoutRoute = clientRoutes.find((item) => item.id === 'ant-design-pro-layout');
+  //
+  //   if (layoutRoute && layoutRoute.children && layoutRoute.children.length > 0) {
+  //     // 跳转到 layout 的第一个子路由
+  //     history.push(layoutRoute.children[0].path);
+  //   }
+  // }
 };

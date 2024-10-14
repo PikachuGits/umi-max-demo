@@ -16,10 +16,8 @@ export default () => {
   }
   useEffect(() => {
     defaultColumns.find((item) => {
-      if (item.dataIndex == 'action') {
+      if (item.dataIndex === 'action') {
         item.render = (event: any) => {
-          // console.log('event', event.props);
-          // text: string, record: object, _, action
           return (
             <div style={{ display: 'flex' }}>
               <a style={{ padding: '5px' }} key="editable">
@@ -46,6 +44,7 @@ export default () => {
           );
         };
       }
+      return item;
     });
   }, []);
 
@@ -58,7 +57,7 @@ export default () => {
         cardBordered
         scroll={{ x: '100%' }}
         request={async (params, sort, filter) => {
-          // console.log(sort, filter);
+          console.log(sort, filter);
           const { current, ...values } = params;
           return await getCompanyListToTable({
             ...values,
@@ -90,6 +89,7 @@ export default () => {
             onChange={() => {
               actionRef.current?.reload();
             }}
+            key={'formDrawer'}
             trigger={
               <Button type="primary">
                 <PlusOutlined />

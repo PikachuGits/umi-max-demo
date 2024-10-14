@@ -4,13 +4,13 @@ import { request } from '@umijs/max';
 
 export async function login(body: { username: string; password: string }, options?: { [key: string]: any }) {
   // 延时函数，返回一个 Promise，在指定时间后 resolve
-  const delay = (ms: number) =>
-    new Promise((resolve) => {
-      setTimeout(() => resolve(true), ms);
-    });
-
-  // 模拟延时，比如延时 2 秒（2000 毫秒）
-  await delay(2000);
+  // const delay = (ms: number) =>
+  //   new Promise((resolve) => {
+  //     setTimeout(() => resolve(true), ms);
+  //   });
+  //
+  // // 模拟延时，比如延时 2 秒（2000 毫秒）
+  // await delay(2000);
 
   // 执行实际的 API 请求
   return request(API.login, {

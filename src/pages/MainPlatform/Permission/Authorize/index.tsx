@@ -1,91 +1,105 @@
-import { motion } from 'framer-motion';
-import React from 'react';
+import { CustomPageContainer } from '@/components';
+import { AuthorizeEnum } from '@/settings/enum';
+import store from '@/store';
+import { classes_module } from '@/utils/class-module';
+import { isEmpty } from '@/utils/format';
+import { useSearchParams } from '@@/exports';
+import { BankOutlined, ProductOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { AuthCompanyList, AuthProjectList, AuthUserList } from './components';
+import styles from './index.less';
 
-const containerVariants = {
-  hidden: { opacity: 1, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      // type: 'spring', //spring  tween inertia
-      type: 'inertia',
-      velocity: 1,
-      // duration: 0.2,
-      // times: [0, 0.1, 0.9, 1],
-      // bounce: 0.7, // 弹簧弹性
-      // damping: 1, // 弹簧阻力系数
-      // mass: 0.5,
-      // stiffness: 150,
-      // velocity: 10,
-      // restSpeed: 2,
-      // delay: 1,
-      // repeat: Infinity, 重复
-      // when: 'afterChildren', // 父级动画在所有子级动画完成之后才开始 beforeChildren afterChildren
-      // staggerChildren: 0.2, // 子元素动画的延迟
-    },
-  },
-};
-
-const childVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
+const iconTypes = new Map([
+  ['company', <BankOutlined key={'company'} />],
+  ['user', <UsergroupAddOutlined key={'user'} />],
+  ['project', <ProductOutlined key={'project'} />],
+]);
 
 const AfterChildrenExample: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [type, setType] = useState('user');
+  const dispatch = useDispatch();
+  function onCleanState() {
+    setSearchParams({});
+    dispatch({ type: 'auth/cleanState' }); // 清除授权缓存层级和详情信息
+  }
+  useEffect(() => {
+    return () => {
+      dispatch({ type: 'auth/cleanState' }); // 清除授权缓存层级和详情信息
+    };
+  }, []);
+
+  const checkedList = useMemo(() => {
+    return store.getState()[AuthorizeEnum.NAME][AuthorizeEnum.LEVEL];
+  }, [store.getState()[AuthorizeEnum.NAME][AuthorizeEnum.LEVEL]]);
+
+  useEffect(() => {
+    /**
+     * level 选择等级
+     * platform_id 对应平台id
+     * platform_entity_id 对应平台实体id
+     * admin_id 用户id
+     * type 对应当前应该查询的页面
+     */
+    const { level, type } = Object.fromEntries(searchParams.entries());
+    if (isEmpty(type)) {
+      setSearchParams({ level: '1', type: 'company' });
+      // 检测方法,如果因为某些原因导致checkedList 没有获取到相应的值,则无法进入后续步骤页面
+    } else if (parseInt(level) > 1 && isEmpty(checkedList[parseInt(level) - 2])) {
+      onCleanState();
+    }
+    setType(type);
+  }, [searchParams]);
+
+  const containerRef = useRef<any>(null); // 内部使用的 ref
+
+  const [containerStyle, setContainer] = useState({
+    width: 0,
+    height: 0,
+  });
+
+  // 当尺寸变化时的回调函数
+  const handleResize = ({ width, height }: { width: number; height: number }) => {
+    console.log(`handleResize:Width: ${width}, Height: ${height}`);
+    // 32 为 pageContainer 上下左右的padding 宽度
+    if (width !== 0 || height !== 0) {
+      setContainer({ width: -32 * 2 + width, height: -32 * 2 + height });
+      // setOverlayStyle({ width, height });
+    }
+  };
+
+  function onCloseButton(data: any) {
+    const { level, platform_id, platform_entity_id, admin_id, type } = data;
+    dispatch({ type: 'auth/removeAuthLevel', payload: { level } });
+    setSearchParams({ level, platform_id, platform_entity_id, admin_id, type });
+  }
+
   return (
-    <div>
-      <motion.div
-        initial={{ opacity: 1, scale: 0.8 }}
-        animate={{ rotate: 180 }}
-        style={{ originX: 0.5, padding: '10px', background: 'red', width: '100px', height: '100px' }}
-        // transition={{ type: 'inertia', velocity: 100 }}
-        whileHover={{ scale: 1 }}
-      />
-      <motion.ul
-        style={{ padding: '10px', background: 'red', width: '100px', height: '100px' }}
-        initial={{ '--rotate': '0deg' } as any}
-        animate={{ '--rotate': '360deg' } as any}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        <li style={{ transform: 'rotate(var(--rotate))' }}>123</li>
-        <li style={{ transform: 'rotate(var(--rotate))' }}>234</li>
-        <li style={{ transform: 'rotate(var(--rotate))' }}>354</li>
-      </motion.ul>
-      {/*<motion.div*/}
-      {/*  initial="hidden"*/}
-      {/*  animate="visible"*/}
-      {/*  variants={containerVariants}*/}
-      {/*    style={{*/}
-      {/*      display: 'flex',*/}
-      {/*      flexDirection: 'column',*/}
-      {/*      gap: '10px',*/}
-      {/*      padding: '20px',*/}
-      {/*      border: '1px solid #ccc',*/}
-      {/*    }}*/}
-      {/*  >*/}
-      {/*    <motion.div*/}
-      {/*      variants={childVariants}*/}
-      {/*      className="child-box"*/}
-      {/*      style={{ backgroundColor: 'lightblue', padding: '10px' }}*/}
-      {/*    >*/}
-      {/*      Child 1*/}
-      {/*    </motion.div>*/}
-      {/*    <motion.div*/}
-      {/*      variants={childVariants}*/}
-      {/*      className="child-box"*/}
-      {/*      style={{ backgroundColor: 'lightgreen', padding: '10px' }}*/}
-      {/*    >*/}
-      {/*      Child 2*/}
-      {/*    </motion.div>*/}
-      {/*    <motion.div*/}
-      {/*      variants={childVariants}*/}
-      {/*      className="child-box"*/}
-      {/*      style={{ backgroundColor: 'lightcoral', padding: '10px' }}*/}
-      {/*    >*/}
-      {/*      Child 3*/}
-      {/*    </motion.div>*/}
-      {/*  </motion.div>*/}
-    </div>
+    <CustomPageContainer ref={containerRef} onResize={handleResize} loading={containerStyle.height === 0}>
+      {checkedList?.map((item: any, key: number) => {
+        return (
+          !isEmpty(item) && (
+            <Button
+              key={key}
+              ghost={true}
+              type="primary"
+              style={{ padding: '6px 10px', margin: '0 10px 10px 10px' }}
+              onClick={() => onCloseButton(item)}
+              icon={iconTypes.get(item.type)}
+              size={'large'}
+              className={classes_module(styles, 'auth-top-button')}
+            >
+              <span>{item.name}</span>
+            </Button>
+          )
+        );
+      })}
+      {type === 'company' && <AuthCompanyList containerStyle={containerStyle}></AuthCompanyList>}
+      {type === 'project' && <AuthProjectList containerStyle={containerStyle}></AuthProjectList>}
+      {type === 'user' && <AuthUserList containerStyle={containerStyle}></AuthUserList>}
+    </CustomPageContainer>
   );
 };
 

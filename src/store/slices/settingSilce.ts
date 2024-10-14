@@ -10,7 +10,6 @@ export const settingSlice = createSlice({
     // 展开菜单
     onCollapsed: (state) => {
       state.collapsed = !state.collapsed;
-      console.log(state.collapsed);
     },
     // 全屏模式
     onFullscreen: (state, { payload }) => {

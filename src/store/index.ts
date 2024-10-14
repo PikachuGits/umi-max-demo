@@ -1,23 +1,29 @@
+import { AuthorizeEnum } from '@/settings/enum';
 import { CacheEnum, PlatformEnum, UserEnum } from '@/settings/enum/';
-import { platformReducer, settingReducer, userReducer } from '@/store/slices';
+import { authorizeReducer, platformReducer, settingReducer, userReducer } from '@/store/slices';
 import { localStorageGet, localStorageSet } from '@/utils/catch';
 import { isEmpty } from '@/utils/format';
 import { configureStore } from '@reduxjs/toolkit';
 
-// 从 localStorage 加载初始状态
+/**
+ * 判断localstorage 中是否存在值,如果没有值则返回空数组
+ * @param key
+ * @param enumName
+ */
+const getStoredValue = (key: string, enumName: string) =>
+  isEmpty(localStorageGet(key)) ? {} : { [enumName]: localStorageGet(key) };
+
+/**
+ * 从 localStorage 加载初始状态
+ */
 const loadState = () => {
   try {
-    const userStorage = localStorageGet(CacheEnum.USER_NAME);
-
-    // 初始化一个状态对象
+    // 根据条件动态添加初始化状态对象
     const state: any = {
-      [PlatformEnum.NAME]: localStorageGet(CacheEnum.PLATFORM_NAME),
+      ...getStoredValue(CacheEnum.PLATFORM_NAME, PlatformEnum.NAME),
+      ...getStoredValue(CacheEnum.AUTHORIZE_NAME, AuthorizeEnum.NAME),
+      ...getStoredValue(CacheEnum.USER_NAME, UserEnum.NAME),
     };
-
-    // 根据条件动态添加 `UserEnum.NAME`
-    if (!isEmpty(userStorage)) {
-      state[UserEnum.NAME] = userStorage;
-    }
 
     return state;
   } catch (err) {
@@ -42,6 +48,7 @@ const preloadedState = loadState();
 const reducer: any = {
   [UserEnum.NAME]: userReducer,
   [PlatformEnum.NAME]: platformReducer,
+  [AuthorizeEnum.NAME]: authorizeReducer,
   setting: settingReducer,
 };
 
@@ -55,6 +62,7 @@ store.subscribe(() => {
   saveState({
     [UserEnum.NAME]: store.getState()[UserEnum.NAME],
     [PlatformEnum.NAME]: store.getState()[PlatformEnum.NAME],
+    [AuthorizeEnum.NAME]: store.getState()[AuthorizeEnum.NAME],
   });
 });
 
