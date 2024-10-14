@@ -123,6 +123,7 @@ export async function getAdminGroupList(
     pageSize?: number;
     current?: number;
     keyword?: string;
+    query_all?: string;
   },
   options?: { [key: string]: any },
 ) {
@@ -161,26 +162,26 @@ export async function addAdminGroup(
   });
 }
 /**
- * 获取用户列表( table )
- * @param params
+ * 添加用户组
+ * @param data
  * @param options
  */
-export async function getAdminList(
-  params: {
+export async function editAdminGroup(
+  data: {
     page?: number;
     pageSize?: number;
-    current?: number;
-    keyword?: string;
+    field_name?: string;
+    id?: number;
   },
   options?: { [key: string]: any },
 ) {
   // 执行实际的 API 请求
-  return request(API.getAdminList, {
-    method: 'GET',
+  return request(API.editAdminGroup, {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    params,
+    data,
     ...(options || {}),
   });
 }
@@ -195,6 +196,7 @@ export async function delAdminGroup(
     pageSize?: number;
     current?: number;
     keyword?: string;
+    id?: string;
   },
   options?: { [key: string]: any },
 ) {
@@ -227,6 +229,134 @@ export async function listGroupUsers(
       'Content-Type': 'application/json',
     },
     data,
+    ...(options || {}),
+  });
+}
+/**
+ * 获取用户列表( table )
+ * @param params
+ * @param options
+ */
+export async function getAdminList(
+  params: {
+    page?: number;
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.getAdminList, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params,
+    ...(options || {}),
+  });
+}
+/**
+ * 修改用户信息
+ * @param data
+ * @param options
+ */
+export async function editAdmin(
+  data: {
+    page?: number;
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+    admin_id?: number;
+    field_name?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.editAdmin, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data,
+    ...(options || {}),
+  });
+}
+/**
+ * 新增用户
+ * @param params
+ * @param options
+ */
+export async function addAdmin(
+  params: {
+    page?: number;
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+    id?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.addAdmin, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params,
+    ...(options || {}),
+  });
+}
+//获取角色列表为用户选择角色
+/**
+ * 获取角色列表( table )
+ * @param data
+ * @param options
+ */
+export async function getRoleList(
+  data: {
+    page?: number;
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+    platform_id?: string;
+    query_all?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.getRoleList, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data,
+    ...(options || {}),
+  });
+}
+//获取角色列表为用户选择角色
+/**
+ * 获取用户角色列表
+ * @param params
+ * @param options
+ */
+export async function getAdminRole(
+  params: {
+    page?: number;
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+    id?: string;
+  },
+  options?: { [key: string]: any },
+) {
+  // 执行实际的 API 请求
+  return request(API.getAdminRole, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params,
     ...(options || {}),
   });
 }

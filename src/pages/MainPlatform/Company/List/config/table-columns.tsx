@@ -32,9 +32,11 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
   },
   {
     title: '企业简称(英文)',
-    width: 120,
+    width: 200,
     dataIndex: 'code',
     search: false,
+    align: 'center',
+    editable: true,
     render: (_: React.ReactNode) => <Tag color={'red'}>{_}</Tag>,
   },
   {
@@ -43,6 +45,8 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
     ellipsis: true,
     // search: false,
     editable: true,
+    search: false,
+    align: 'center',
     dataIndex: 'address',
   },
   {
@@ -50,14 +54,16 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
     dataIndex: 'tin',
     width: 200,
     editable: true,
+    align: 'center',
     search: false,
   },
   {
     title: '公司类型',
     width: 200,
+    search: false,
     dataIndex: 'company_type',
-    // search: false,
-    editable: true,
+    editable: false,
+    align: 'center',
     valueType: 'select',
     valueEnum: {
       all: { text: '超长'.repeat(50) },

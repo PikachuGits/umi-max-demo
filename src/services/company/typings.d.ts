@@ -22,4 +22,5 @@ interface Company {
   sort?: string;
   company_type?: string; // 如果有特定的类型，可以考虑使用枚举类型
   short?: string;
+  admin_id?: number;
 }

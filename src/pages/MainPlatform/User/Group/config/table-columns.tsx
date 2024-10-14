@@ -27,6 +27,7 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
     ellipsis: true,
     align: 'center',
     width: 250,
+    editable: true,
     // tooltip: '标题过长会自动收缩',
     formItemProps: {
       rules: [
@@ -40,17 +41,17 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
   {
     title: '创建时间',
     width: 300,
-    ellipsis: true,
+    align: 'center',
+    editable: false,
     search: false,
-    editable: true,
     dataIndex: 'created_time',
   },
   {
     title: '更新时间',
     width: 300,
-    ellipsis: true,
+    align: 'center',
+    editable: false,
     search: false,
-    editable: true,
     dataIndex: 'updated_time',
   },
   {
@@ -62,25 +63,4 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
     fixed: 'right',
     width: 100,
   },
-  // {
-  //   title: '操作',
-  //   valueType: 'option',
-  //   key: 'option',
-  //   align: 'center',
-  //   fixed: 'right',
-  //   width: 100,
-  //   render: () => {
-  //     // text: string, record: object, _, action
-  //     return (
-  //       <div>
-  //         <a style={{ padding: '5px' }} key="editable" onClick={() => {}}>
-  //           <FormOutlined />
-  //         </a>
-  //         <a style={{ padding: '5px' }} key="delete" onClick={() => {}}>
-  //           <DeleteOutlined style={{ color: 'red' }} />
-  //         </a>
-  //       </div>
-  //     );
-  //   },
-  // },
 ];

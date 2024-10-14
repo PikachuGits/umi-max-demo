@@ -6,12 +6,17 @@ import { useEffect, useState } from 'react';
 export default (props: any) => {
   const [initialValues, setInitialValues] = useState({});
   useEffect(() => {
-    console.log(props.initialValues);
-    setInitialValues({
-      ...props.initialValues,
-      logoBase64: [{ name: 'logo', url: props.initialValues?.logoBase64 }],
-    });
+    if (props.initialValues?.id) {
+      setInitialValues({
+        ...props.initialValues,
+        logoBase64: [{ name: 'logo', url: props.initialValues?.logoBase64 }],
+      });
+    } else {
+      // 如果是新增的情况，可以清空 initialValues
+      setInitialValues({});
+    }
   }, [props.initialValues]);
+
   return (
     <div>
       <DrawerForm
@@ -28,6 +33,7 @@ export default (props: any) => {
           if (props.initialValues?.id) {
             console.log(props.initialValues?.id, values);
             await editCompanyInfo({ ...formData, id: props.initialValues?.id });
+            return true;
           } else {
             console.log('values', values.logoBase64);
             await addCompany(formData);
@@ -35,7 +41,7 @@ export default (props: any) => {
 
           message.success('提交成功');
           props.onChange();
-          // return true;
+          return true;
         }}
         initialValues={initialValues}
       >
@@ -149,17 +155,17 @@ export default (props: any) => {
               },
             ]}
           />
+        </ProForm.Group>
+        <ProForm.Group>
           <ProFormUploadButton
             name="logoBase64"
-            label="上传logo"
+            label="公司logo"
             max={1}
             fieldProps={{
               name: 'file',
               listType: 'picture-card',
             }}
           />
-          {/*<ProFormUploadDragger name="logoBase64" label="拖拽上传" required={true} />*/}
-          {/*<ProFormUploadButton name="logo" label="拖拽上传" required={true} />*/}
         </ProForm.Group>
         {/*<ProForm.Group>*/}
         {/*  <ProFormText name={['contract', 'name']} width="md" label="合同名称" placeholder="请输入名称" />*/}

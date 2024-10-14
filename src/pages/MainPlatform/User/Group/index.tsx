@@ -1,7 +1,7 @@
 import { CustomPageContainer, ProEditable } from '@/components';
 import { GroupFormDrawer } from '@/pages/MainPlatform/User/Group/component';
 import { defaultColumns } from '@/pages/MainPlatform/User/Group/config/table-columns';
-import { delAdminGroup, getAdminGroupList } from '@/services/user/UserController';
+import { delAdminGroup, editAdminGroup, getAdminGroupList } from '@/services/user/UserController';
 import { DeleteOutlined, FormOutlined, PlusOutlined } from '@ant-design/icons';
 import { ActionType } from '@ant-design/pro-components';
 import { Button } from 'antd';
@@ -11,8 +11,8 @@ export default () => {
   const actionRef = useRef<ActionType>();
 
   async function handleSave(value: Company, record: Company) {
-    // await editCompanyInfo({ ...value, id: record.id });
-    // actionRef.current?.reload();
+    await editAdminGroup({ ...value, id: record.id });
+    actionRef.current?.reload();
   }
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default () => {
           console.log('event', '11111');
           // text: string, record: object, _, action
           return (
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <a style={{ padding: '5px' }} key="editable">
                 <GroupFormDrawer
                   onChange={() => {
@@ -36,8 +36,9 @@ export default () => {
                 style={{ padding: '5px' }}
                 key="delete"
                 onClick={() => {
-                  console.log('event', event.props.record.id);
-                  delAdminGroup({});
+                  delAdminGroup({ id: event.props.record.id }).then(() => {
+                    actionRef.current?.reload();
+                  });
                 }}
               >
                 <DeleteOutlined style={{ color: 'red' }} />

@@ -1,6 +1,6 @@
 import { ProEditable } from '@/components';
 import { defaultColumns } from '@/pages/MainPlatform/User/Group/config/form-table-columns';
-import { addAdminGroup, getAdminList, listGroupUsers } from '@/services/user/UserController';
+import { addAdminGroup, editAdminGroup, getAdminList, listGroupUsers } from '@/services/user/UserController';
 import { DrawerForm, ProForm, ProFormText } from '@ant-design/pro-components';
 import { message } from 'antd';
 import { useEffect, useState } from 'react';
@@ -56,12 +56,20 @@ export default (props: any) => {
             return false;
           }
           try {
-            await addAdminGroup({
-              ...values,
-              field_name: 'group_id',
-              ids: selectedRowKeys, // 这里将 selectedRowKeys 作为 ids 数组传递
-            });
-
+            if (props.initialValues?.id) {
+              await editAdminGroup({
+                ...values,
+                id: props.initialValues.id,
+                ids: selectedRowKeys,
+                field_name: 'group_id',
+              });
+            } else {
+              await addAdminGroup({
+                ...values,
+                field_name: 'group_id',
+                ids: selectedRowKeys, // 这里将 selectedRowKeys 作为 ids 数组传递
+              });
+            }
             message.success('提交成功');
             props.onChange();
             return true;

@@ -1,4 +1,3 @@
-import { DeleteOutlined, FormOutlined } from '@ant-design/icons';
 import React from 'react';
 
 type DataType = {
@@ -72,23 +71,11 @@ export const defaultColumns: BgptColumnTypes<DataType> = [
   },
   {
     title: '操作',
+    dataIndex: 'action',
     valueType: 'option',
     key: 'option',
     align: 'center',
     fixed: 'right',
     width: 100,
-    render: () => {
-      // text: string, record: object, _, action
-      return (
-        <div>
-          <a style={{ padding: '5px' }} key="editable" onClick={() => {}}>
-            <FormOutlined />
-          </a>
-          <a style={{ padding: '5px' }} key="delete" onClick={() => {}}>
-            <DeleteOutlined style={{ color: 'red' }} />
-          </a>
-        </div>
-      );
-    },
   },
 ];

@@ -1,18 +1,46 @@
 import { CustomPageContainer, ProEditable } from '@/components';
+import { UserFormDrawer } from '@/pages/MainPlatform/User/List/component';
 import { defaultColumns } from '@/pages/MainPlatform/User/List/config/table-columns';
-import { getAdminList } from '@/services/user/UserController';
-import { PlusOutlined } from '@ant-design/icons';
+import { editAdmin, getAdminList } from '@/services/user/UserController';
+import { FormOutlined, PlusOutlined } from '@ant-design/icons';
 import { ActionType } from '@ant-design/pro-components';
 import { Button } from 'antd';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default () => {
   const actionRef = useRef<ActionType>();
 
   async function handleSave(value: Company, record: Company) {
-    // await editCompanyInfo({ ...value, id: record.id });
-    // actionRef.current?.reload();
+    await editAdmin({ ...value, admin_id: record.admin_id, field_name: 'group_id' });
+    actionRef.current?.reload();
   }
+
+  useEffect(() => {
+    defaultColumns.find((item) => {
+      if (item.dataIndex == 'action') {
+        item.render = (event: any) => {
+          // console.log('event', event.props);
+          // text: string, record: object, _, action
+          return (
+            <div style={{ display: 'flex' }}>
+              <a style={{ padding: '5px' }} key="editable">
+                <UserFormDrawer
+                  onChange={() => {
+                    actionRef.current?.reload();
+                  }}
+                  trigger={<FormOutlined />}
+                  initialValues={{ ...event.props.record, roles: [], group_id: [] }}
+                />
+              </a>
+              {/*<a style={{ padding: '5px' }} key="delete" onClick={() => {}}>*/}
+              {/*  <DeleteOutlined style={{ color: 'red' }} />*/}
+              {/*</a>*/}
+            </div>
+          );
+        };
+      }
+    });
+  }, []);
 
   return (
     <CustomPageContainer>
@@ -51,16 +79,17 @@ export default () => {
           // onChange: (page) => console.log('page', page),
         }}
         additionalButtons={[
-          <Button
-            key="button"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              // actionRef.current?.reload();
+          <UserFormDrawer
+            onChange={() => {
+              actionRef.current?.reload();
             }}
-            type="primary"
-          >
-            创建公司
-          </Button>,
+            trigger={
+              <Button type="primary">
+                <PlusOutlined />
+                添加用户
+              </Button>
+            }
+          />,
         ]}
       />
     </CustomPageContainer>

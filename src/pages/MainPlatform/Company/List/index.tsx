@@ -1,7 +1,7 @@
 import { CustomPageContainer, ProEditable } from '@/components';
 import { CompanyFormDrawer } from '@/pages/MainPlatform/Company/List/component';
 import { defaultColumns } from '@/pages/MainPlatform/Company/List/config/table-columns';
-import { editCompanyInfo, getCompanyListToTable } from '@/services/company/CompanyController';
+import { delCompany, editCompanyInfo, getCompanyListToTable } from '@/services/company/CompanyController';
 import { DeleteOutlined, FormOutlined, PlusOutlined } from '@ant-design/icons';
 import { ActionType } from '@ant-design/pro-components';
 import { Button } from 'antd';
@@ -31,7 +31,15 @@ export default () => {
                   initialValues={event.props.record}
                 />
               </a>
-              <a style={{ padding: '5px' }} key="delete" onClick={() => {}}>
+              <a
+                style={{ padding: '5px' }}
+                key="delete"
+                onClick={() => {
+                  delCompany({ id: event.props.record.id }).then(() => {
+                    actionRef.current?.reload();
+                  });
+                }}
+              >
                 <DeleteOutlined style={{ color: 'red' }} />
               </a>
             </div>
